@@ -15,10 +15,19 @@ export const loginUser = async (student_id: string, password: string) => {
   if (user.password !== password) {
     return { success: false, message: 'Incorrect password' };
   }
+  
+  let redirectPath = '/';
+  if (user.role === 'admin') {
+    redirectPath = '/admin/dashboard';
+  } else if (user.role === 'student') {
+    redirectPath = '/student/home';
+  }
+
 
   return {
     success: true,
     message: 'Login successful',
+    role: user.rloe,
     user: {
       id: user.id_user,
       student_id: user.student_id,
