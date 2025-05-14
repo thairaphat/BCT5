@@ -3,6 +3,7 @@ import { testConnection } from "./connect/db";
 import { loginRoute } from "./route/LoginRoute";
 import { registerRoute } from "./route/register";
 import { authMiddleware } from './middleware/authMiddleware';
+import { JWTPayload } from "jose";
 async function startApp() {
   try {
     
@@ -12,17 +13,20 @@ async function startApp() {
       process.exit(1);
     }
     
-   
-    const app = new Elysia()
-      .get("/", () => "Hello Elysia")
-      .use(loginRoute)
-      .use(registerRoute)
+  const app = new Elysia()
+  .use(loginRoute)
+  .use(registerRoute)
+  .group('/api', (app) =>
+    app
       .use(authMiddleware)
-      .listen(3000);
-      
-    console.log(
-      `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-    );
+      .get('/profile', ({ user }: { user: JWTPayload }) => ({
+        message: 'Hello ' + user.role,
+        id: user.id,
+      }))
+  )
+  .listen(3000);
+
+console.log(`Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
     
   } catch (error) {
     console.error("Error starting application:", error);

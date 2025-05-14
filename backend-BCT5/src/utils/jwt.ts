@@ -1,13 +1,14 @@
 export interface JWTPayload {
-  sub: string;
+  id: string;
   role: string;
+  iat?: number; // วันที่ออกโทเค็น (optional)
+  exp?: number; // วันที่หมดอายุ (optional)
 }
 
-export function isJWTPayload(payload: unknown): payload is JWTPayload {
+export function isJWTPayload(payload: any): payload is JWTPayload {
   return (
-    typeof payload === 'object' &&
-    payload !== null &&
-    'sub' in payload &&
-    'role' in payload
+    payload &&
+    typeof payload.id === 'string' &&
+    typeof payload.role === 'string'
   );
 }
