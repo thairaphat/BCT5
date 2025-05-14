@@ -20,7 +20,7 @@ export const loginUser = async (student_id: string, password: string) => {
 
   
   //กรณีที่จะใช้เช็คหลายrole
-  const allowedRoles = ['student', 'admin'];
+  const allowedRoles = ['student', 'admin', 'staff'];
 
 if (!allowedRoles.includes(user.role)) {
   return {
@@ -28,20 +28,26 @@ if (!allowedRoles.includes(user.role)) {
     message: 'This role is not allowed to login.',
   };
 }
-
-  let redirectPath = '/';
-  if (user.role === 'admin') {
-    redirectPath = '/admin/dashboard';
-  } else if (user.role === 'student') {
-    redirectPath = '/student/home';
+let redirectPath = '/';
+  switch (user.role) {
+    case 'admin':
+      redirectPath = '/admin/dashboard';
+      break;
+    case 'student':
+      redirectPath = '/student/home';
+      break;
+    case 'staff':
+      redirectPath = '/staff/home';
+      break;
+    default:
+      redirectPath = '/';
   }
-
 
   return {
     success: true,
     message: 'Login successful',
     role: user.role,
-     redirect: redirectPath,
+    redirect: redirectPath,
     user: {
       id: user.id_user,
       student_id: user.student_id,
