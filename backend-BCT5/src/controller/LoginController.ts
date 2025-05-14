@@ -17,10 +17,18 @@ export const loginUser = async (student_id: string, password: string) => {
     return { success: false, message: 'User not found' };
   }
 
+ 
   if (user.password !== password) {
     return { success: false, message: 'Incorrect password' };
   }
 
+
+  if (user.status === 'banned') {
+    return {
+      success: false,
+      message: 'Your account has been banned. Please contact admin.',
+    };
+  }
 
 
 
@@ -58,8 +66,8 @@ export const loginUser = async (student_id: string, password: string) => {
 .setProtectedHeader({ alg: 'HS256' })
 .setExpirationTime('2h')
 .sign(jwtSecret);
-console.log('✅ login-token:', token);
-console.log('🔐 login-secret:', Buffer.from(jwtSecret).toString('base64'));
+console.log(' login-token:', token);
+console.log(' login-secret:', Buffer.from(jwtSecret).toString('base64'));
   return {
     success: true,
     message: 'Login successful',
