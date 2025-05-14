@@ -14,12 +14,21 @@ const pool = new Pool({
 });
 
 // ฟังก์ชันพื้นฐานสำหรับรันคิวรี่
-
+export const query = async <T = any>(
+  text: string, 
+  params: any[] = []
+): Promise<QueryResult<T>> => {
+  try {
+    return await pool.query<T>(text, params);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    throw error;
+  }
+};
 
 // ตรวจสอบการเชื่อมต่อฐานข้อมูล (มีประโยชน์สำหรับการตรวจสอบเมื่อเริ่มแอปพลิเคชัน)
 export const testConnection = async (): Promise<boolean> => {
   try {
-
     console.log('Database connection successful:');
     return true;
   } catch (error) {
