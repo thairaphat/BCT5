@@ -23,7 +23,7 @@ export const loginUser = async (student_id: string, password: string) => {
       id: user.id_user,
       student_id: user.student_id,
       role: user.role,
-      status: user.status
+      status: user.status,
     }
   };
 };

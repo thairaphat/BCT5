@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { testConnection } from "./connect/db";
-
+import { loginRoute } from "./route/LoginRoute";
 // เชื่อมต่อและตรวจสอบฐานข้อมูลเมื่อเริ่มต้นแอปพลิเคชัน
 async function startApp() {
   try {
@@ -14,8 +14,9 @@ async function startApp() {
     // เริ่มเซิร์ฟเวอร์ Elysia
     const app = new Elysia()
       .get("/", () => "Hello Elysia")
+      .use(loginRoute)
       .listen(3000);
-    
+      
     console.log(
       `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
     );
