@@ -16,20 +16,18 @@ export const loginUser = async (student_id: string, password: string) => {
     return { success: false, message: 'Incorrect password' };
   }
   
-  if(user.password !== password){
-    return{success:false,
-      message: `User with role '${user.role}' are not allowed to login here.`,
-    };
-  }
-  //กรณีที่จะใช้เช็คหลายrole
-//   const allowedRoles = ['student', 'staff'];
 
-// if (!allowedRoles.includes(user.role)) {
-//   return {
-//     success: false,
-//     message: 'This role is not allowed to login.',
-//   };
-// }
+
+  
+  //กรณีที่จะใช้เช็คหลายrole
+  const allowedRoles = ['student', 'admin'];
+
+if (!allowedRoles.includes(user.role)) {
+  return {
+    success: false,
+    message: 'This role is not allowed to login.',
+  };
+}
 
   let redirectPath = '/';
   if (user.role === 'admin') {
