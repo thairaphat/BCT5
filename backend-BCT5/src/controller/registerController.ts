@@ -77,6 +77,7 @@ export const registerUser = async (
       return {
         success: true,
         message: 'ลงทะเบียนสำเร็จ',
+        redirectTo: '/login',
         user: {
           id: userResult.rows[0].id_user,
           student_id,
