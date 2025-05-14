@@ -6,6 +6,11 @@ import { authMiddleware } from './middleware/authMiddleware';
 import type { CustomContext } from './type/context';
 import { adminController } from './controller/admin/adminController';
 import { studentRoute } from './route/studentRoute';
+import { createActivity } from './controller/staff/createActivities';
+import { editActivity } from './controller/staff/editActivities';
+import { cancelActivity } from './controller/staff/cancelActivities';
+import { closeActivity } from './controller/staff/closeActivities';
+import { getAllActivities } from './controller/staff/getActivities';
 async function startApp() {
   try {
     const dbConnected = await testConnection();
@@ -15,19 +20,24 @@ async function startApp() {
     }
 
     const app = new Elysia()
-     .use(adminController)
-  .use(loginRoute)
-  .use(registerRoute)
-   .use(studentRoute) 
-  .group('/api', app => {
-    return app
-      .use(authMiddleware)
-      .get('/profile', ({ user }: CustomContext) => {
-        return `hello, user ${user.id}`;
+      .use(adminController)
+      .use(loginRoute)
+      .use(registerRoute)
+      .use(studentRoute)
+      // .use(createActivity)
+      // .use(editActivity)
+      // .use(cancelActivity)
+      // .use(closeActivity)
+      // .use(getAllActivities)
+      .group('/api', app => {
+        return app
+          .use(authMiddleware)
+          .get('/profile', ({ user }: CustomContext) => {
+            return `hello, user ${user.id}`;
+          });
       });
-  });
 
-app.listen(3000);
+    app.listen(3000);
 
     console.log(`Elysia is running at http://${app.server?.hostname}:${app.server?.port}`);
   } catch (error) {

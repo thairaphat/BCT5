@@ -1,5 +1,5 @@
 import pool from '../../connect/db';
-
+import { Elysia } from 'elysia';
 // ดึงข้อมูลกิจกรรมทั้งหมด
 export const getAllActivities = async (status: string[] = ['open', 'closed', 'cancelled']) => {
   try {

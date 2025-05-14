@@ -1,5 +1,5 @@
 import pool from '../../connect/db';
-
+import { Elysia } from 'elysia';
 export const closeActivity = async (activity_id: number, closed_by: number) => {
   try {
     // ตรวจสอบว่ากิจกรรมมีอยู่จริงและไม่ถูกปิดหรือยกเลิกไปแล้ว
