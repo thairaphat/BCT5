@@ -20,9 +20,9 @@ export const registerUser = async (
       return { success: false, message: 'รหัสนักศึกษานี้มีในระบบแล้ว' };
     }
 
-    // ตรวจสอบว่าอีเมลซ้ำหรือไม่
+    // ตรวจสอบว่า email มีอยู่แล้วหรือไม่
     const checkEmailResult = await pool.query(
-      'SELECT * FROM users WHERE email = $1 LIMIT 1',
+      'SELECT * FROM user_details WHERE email = $1 LIMIT 1',
       [email]
     );
 
@@ -54,21 +54,22 @@ export const registerUser = async (
     try {
       await client.query('BEGIN');
 
-      // บันทึกข้อมูลผู้ใช้
-      const userResult = await client.query(
-        `INSERT INTO users (student_id, password, firstname, lastname, email, role, status, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, 'student', 'active', NOW())
-        RETURNING id_user, student_id, firstname, lastname, email, role, status`,
-        [student_id, password, firstname, lastname, email]
+      // 1. สร้าง user_details ก่อน
+      const detailsResult = await client.query(
+        `INSERT INTO user_details (first_name, last_name, email, faculty_id, department_id)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id_user_details, first_name, last_name, email, faculty_id, department_id`,
+        [firstname, lastname, email, faculty_id, department_id]
       );
 
-      const userId = userResult.rows[0].id_user;
+      const userDetailsId = detailsResult.rows[0].id_user_details;
 
-      // บันทึกข้อมูลเพิ่มเติมในตาราง user_details
-      await client.query(
-        `INSERT INTO user_details (user_id, faculty_id, department_id, created_at)
-        VALUES ($1, $2, $3, NOW())`,
-        [userId, faculty_id, department_id]
+      // 2. จากนั้นสร้าง users และเชื่อมโยงกับ user_details
+      const userResult = await client.query(
+        `INSERT INTO users (student_id, password, role, status, id_user_details, created_at)
+         VALUES ($1, $2, 'student', 'active', $3, CURRENT_TIMESTAMP)
+         RETURNING id_user, student_id, role, status`,
+        [student_id, password, userDetailsId]
       );
 
       await client.query('COMMIT');
@@ -77,7 +78,7 @@ export const registerUser = async (
         success: true,
         message: 'ลงทะเบียนสำเร็จ',
         user: {
-          id: userId,
+          id: userResult.rows[0].id_user,
           student_id,
           firstname,
           lastname,
