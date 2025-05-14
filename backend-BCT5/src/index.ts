@@ -5,6 +5,7 @@ import { registerRoute } from "./route/register";
 import { authMiddleware } from './middleware/authMiddleware';
 import type { CustomContext } from './type/context';
 import { adminController } from './controller/admin/adminController';
+import { studentRoute } from './route/studentRoute';
 async function startApp() {
   try {
     const dbConnected = await testConnection();
@@ -17,6 +18,7 @@ async function startApp() {
      .use(adminController)
   .use(loginRoute)
   .use(registerRoute)
+   .use(studentRoute) 
   .group('/api', app => {
     return app
       .use(authMiddleware)
