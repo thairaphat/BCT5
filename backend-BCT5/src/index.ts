@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { testConnection } from "./connect/db";
 import { loginRoute } from "./route/LoginRoute";
+import { registerRoute } from "./route/register";
 // เชื่อมต่อและตรวจสอบฐานข้อมูลเมื่อเริ่มต้นแอปพลิเคชัน
 async function startApp() {
   try {
@@ -15,6 +16,7 @@ async function startApp() {
     const app = new Elysia()
       .get("/", () => "Hello Elysia")
       .use(loginRoute)
+      .use(registerRoute)
       .listen(3000);
       
     console.log(
