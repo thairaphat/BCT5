@@ -1,4 +1,4 @@
-import { pool } from '../connect/db';
+import  pool  from '../connect/db';
 
 export const loginUser = async (student_id: string, password: string) => {
   const result = await pool.query(
