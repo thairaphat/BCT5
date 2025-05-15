@@ -92,9 +92,8 @@ export const joinActivity = async (user_id: number, activity_id: number) => {
 // ดึงข้อมูลกิจกรรมที่นิสิตลงทะเบียนไว้
 export const getStudentActivities = async (user_id: number) => {
   try {
-    // ปรับปรุง query ให้สอดคล้องกับโครงสร้างฐานข้อมูล
     const result = await pool.query(
-      `SELECT r.id, r.user_id, r.activity_id, r.status as registration_status, 
+      `SELECT r.registration_id, r.user_id, r.activity_id, r.status as registration_status, 
               r.registration_date, r.attended_date, r.points_earned, r.hours_earned,
               a.id as activity_id, a.name, a.activity_type, a.status as activity_status,
               ad.description, ad.location, ad.start_date, ad.end_date, 
