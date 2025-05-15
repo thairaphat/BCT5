@@ -10,6 +10,13 @@ import {
   recordAttendance 
 } from '../controller/staff/manageParticipantsController';
 
+// import controller ใหม่สำหรับประวัติกิจกรรม
+import {
+  getStudentActivityHistory,
+  getStudentActivityDetail,
+  getStudentDashboard
+} from '../controller/student/activityHistoryController';
+
 // Student routes
 const studentRoutes = new Elysia()
   .use(authMiddleware)
@@ -32,6 +39,35 @@ const studentRoutes = new Elysia()
     }
     
     return await getStudentActivities(parseInt(user.id));
+  })
+  // เพิ่มเส้นทางใหม่เพื่อแสดงประวัติกิจกรรมอย่างละเอียด
+  .get('/activity-history', async ({ user }) => {
+    if (!user) {
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
+    
+    return await getStudentActivityHistory(parseInt(user.id));
+  })
+  // เพิ่มเส้นทางสำหรับดูรายละเอียดกิจกรรมที่นักศึกษาลงทะเบียน
+  .get('/activity-detail/:activityId', async ({ params, user }) => {
+    if (!user) {
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
+    
+    const activity_id = parseInt(params.activityId);
+    return await getStudentActivityDetail(parseInt(user.id), activity_id);
+  }, {
+    params: t.Object({
+      activityId: t.String()
+    })
+  })
+  // เพิ่มเส้นทางสำหรับแดชบอร์ดนักศึกษา
+  .get('/dashboard', async ({ user }) => {
+    if (!user) {
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
+    
+    return await getStudentDashboard(parseInt(user.id));
   });
 
 // Staff routes
