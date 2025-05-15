@@ -7,6 +7,7 @@ import type { CustomContext } from './type/context';
 import { adminRoute } from './route/adminRoute';
 import { studentRoute } from './route/studentRoute';
 import { staffRoute } from './route/staffRoute';
+import { routes as activityRoutes } from './route/activityRoutes'
 async function startApp() {
   try {
     const dbConnected = await testConnection();
@@ -21,7 +22,7 @@ async function startApp() {
   .use(loginRoute)
   .use(registerRoute)
   .use(studentRoute) 
-   
+  .use(activityRoutes)
   .group('/api', app => {
     return app
       .use(staffRoute) 

@@ -159,7 +159,7 @@ export const staffRoute = new Elysia()
       return {
         success: false,
         message: 'ไม่มีสิทธิ์ในการยกเลิกกิจกรรม'
-      };
+      }
     }
 
     const activity_id = parseInt(params.id);
