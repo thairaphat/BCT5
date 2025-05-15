@@ -69,7 +69,7 @@ export const joinActivity = async (user_id: number, activity_id: number) => {
     const result = await pool.query(
       `INSERT INTO registrations (user_id, activity_id, registration_date, status, created_at, updated_at)
        VALUES ($1, $2, $3, 'pending', $4, $5)
-       RETURNING id`,
+       RETURNING registration_id`,
       [user_id, activity_id, currentDate, currentDate, currentDate]
     );
 
@@ -77,7 +77,7 @@ export const joinActivity = async (user_id: number, activity_id: number) => {
       success: true,
       message: 'ลงทะเบียนเข้าร่วมกิจกรรมสำเร็จ รอการอนุมัติ',
       activity_id,
-      registration_id: result.rows[0].id
+      registration_id: result.rows[0].registration_id
     };
   } catch (error) {
     console.error('Error joining activity:', error);
