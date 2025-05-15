@@ -138,7 +138,7 @@ export const staffRoute = new Elysia()
   })
 
   // ปิดกิจกรรม
-  .patch('/activities/:id/close', async ({ params, user }) => {
+   .patch('/activities/:id/close', async ({ params, user }) => {
     if (!user || user.role !== 'staff') {
       return {
         success: false,
@@ -153,9 +153,8 @@ export const staffRoute = new Elysia()
       id: t.String()
     })
   })
-
   // ยกเลิกกิจกรรม
-  .patch('/activities/:id/cancel', async ({ params, body, user }) => {
+ .patch('/activities/:id/cancel', async ({ params, body, user }) => {
     if (!user || user.role !== 'staff') {
       return {
         success: false,
@@ -175,3 +174,4 @@ export const staffRoute = new Elysia()
       reason: t.String()
     })
   });
+

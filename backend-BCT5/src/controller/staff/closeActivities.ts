@@ -1,6 +1,7 @@
 import pool from '../../connect/db';
 import { Elysia } from 'elysia';
 export const closeActivity = async (activity_id: number, closed_by: number) => {
+  console.log('ปิดกิจกรรม id:', activity_id, 'user:', closed_by);
   try {
     // ตรวจสอบว่ากิจกรรมมีอยู่จริงและไม่ถูกปิดหรือยกเลิกไปแล้ว
     const activityCheckResult = await pool.query(
