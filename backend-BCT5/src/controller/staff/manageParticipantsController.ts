@@ -4,7 +4,7 @@ import pool from '../../connect/db';
 export const getActivityParticipants = async (activity_id: number) => {
   try {
     const result = await pool.query(
-      `SELECT r.id as registration_id, r.user_id, r.status as registration_status, 
+      `SELECT r.registration_id, r.user_id, r.status as registration_status, 
               r.registration_date, r.attended_date, r.points_earned, r.hours_earned, r.feedback,
               u.student_id, 
               ud.first_name, ud.last_name, 
@@ -56,7 +56,7 @@ export const approveParticipant = async (registration_id: number, approved_by: n
   try {
     // ตรวจสอบสถานะการลงทะเบียน
     const checkResult = await pool.query(
-      'SELECT status FROM registrations WHERE id = $1',
+      'SELECT status FROM registrations WHERE registration_id = $1',
       [registration_id]
     );
 
@@ -78,7 +78,7 @@ export const approveParticipant = async (registration_id: number, approved_by: n
     await pool.query(
       `UPDATE registrations 
        SET status = 'approved', updated_at = CURRENT_TIMESTAMP
-       WHERE id = $1`,
+       WHERE registration_id = $1`,
       [registration_id]
     );
 
@@ -102,7 +102,7 @@ export const rejectParticipant = async (registration_id: number, rejected_by: nu
   try {
     // ตรวจสอบสถานะการลงทะเบียน
     const checkResult = await pool.query(
-      'SELECT status FROM registrations WHERE id = $1',
+      'SELECT status FROM registrations WHERE registration_id = $1',
       [registration_id]
     );
 
@@ -124,7 +124,7 @@ export const rejectParticipant = async (registration_id: number, rejected_by: nu
     await pool.query(
       `UPDATE registrations 
        SET status = 'rejected', feedback = $2, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $1`,
+       WHERE registration_id = $1`,
       [registration_id, reason]
     );
 
@@ -149,7 +149,7 @@ export const recordAttendance = async (registration_id: number, hours_earned: nu
   try {
     // ตรวจสอบสถานะการลงทะเบียน
     const checkResult = await pool.query(
-      'SELECT status FROM registrations WHERE id = $1',
+      'SELECT status FROM registrations WHERE registration_id = $1',
       [registration_id]
     );
 
@@ -173,7 +173,7 @@ export const recordAttendance = async (registration_id: number, hours_earned: nu
       `UPDATE registrations 
        SET status = 'attended', attended_date = $2, hours_earned = $3, points_earned = $4, 
            feedback = $5, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $1`,
+       WHERE registration_id = $1`,
       [registration_id, currentDate, hours_earned, points_earned, feedback]
     );
 
