@@ -4,9 +4,19 @@ import { editActivity } from '../controller/staff/editActivities';
 import { closeActivity } from '../controller/staff/closeActivities';
 import { cancelActivity } from '../controller/staff/cancelActivities';
 import { getAllActivities, getActivityById } from '../controller/staff/getActivities';
-
+import { User } from '../type/type';
+import { authMiddleware } from '../middleware/authMiddleware';
+import {staffAuthMiddleware} from '../middleware/staffAuthMiddleware'
+type Context = {
+  user: User;
+};
 export const staffRoute = new Elysia()
+ .use(staffAuthMiddleware)
+ 
+  
+
   // ดึงข้อมูลกิจกรรมทั้งหมด
+  
   .get('/activities', async ({ query }) => {
     const status = query.status ? query.status.split(',') : ['open', 'closed', 'cancelled'];
     return await getAllActivities(status);

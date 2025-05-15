@@ -6,6 +6,7 @@ import { authMiddleware } from './middleware/authMiddleware';
 import type { CustomContext } from './type/context';
 import { adminController } from './controller/admin/adminController';
 import { studentRoute } from './route/studentRoute';
+import { staffRoute } from './route/staffRoute';
 async function startApp() {
   try {
     const dbConnected = await testConnection();
@@ -15,12 +16,15 @@ async function startApp() {
     }
 
     const app = new Elysia()
+    
      .use(adminController)
   .use(loginRoute)
   .use(registerRoute)
    .use(studentRoute) 
+   
   .group('/api', app => {
     return app
+      .use(staffRoute) 
       .use(authMiddleware)
       .get('/profile', ({ user }: CustomContext) => {
         return `hello, user ${user.id}`;
