@@ -4,7 +4,7 @@ import { loginRoute } from "./route/LoginRoute";
 import { registerRoute } from "./route/register";
 import { authMiddleware } from './middleware/authMiddleware';
 import type { CustomContext } from './type/context';
-import { adminController } from './controller/admin/adminController';
+import { adminRoute } from './route/adminRoute';
 import { studentRoute } from './route/studentRoute';
 import { staffRoute } from './route/staffRoute';
 async function startApp() {
@@ -15,12 +15,12 @@ async function startApp() {
       process.exit(1);
     }
 
-    const app = new Elysia()
+  const app = new Elysia()
     
-     .use(adminController)
+  .use(adminRoute)
   .use(loginRoute)
   .use(registerRoute)
-   .use(studentRoute) 
+  .use(studentRoute) 
    
   .group('/api', app => {
     return app
