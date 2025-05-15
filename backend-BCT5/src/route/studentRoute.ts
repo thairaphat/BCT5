@@ -3,7 +3,7 @@ import pool from '../connect/db';
 import { authMiddleware } from '../middleware/authMiddleware';
 import type { CustomContext } from '../type/context';
 import { getStudentDashboard, getStudentActivityHistory, getStudentActivityDetail } from '../controller/student/activityHistoryController';
-
+import { filterActivitiesByType, getMyRegisteredActivities } from '../controller/student/studentController'
 export const studentRoute = new Elysia()
 
   .use(authMiddleware) // แนบ middleware ตรวจ JWT
@@ -45,6 +45,18 @@ export const studentRoute = new Elysia()
     
     return await getStudentDashboard(parseInt(user.id));
   })
+  .get('/student/activities/filter/:type', async ({ params, user, set }: CustomContext) => {
+    if (user.role !== 'student') {
+      set.status = 403;
+      return { success: false, message: 'Access denied' };
+    }
+
+    return await filterActivitiesByType({ params, user, set });
+  }, {
+    params: t.Object({
+      type: t.String()
+    })
+  })
   
   // เพิ่ม route สำหรับประวัติกิจกรรมของนักศึกษา
   .get('/student/activity-history', async ({ user }: CustomContext) => {
@@ -54,7 +66,15 @@ export const studentRoute = new Elysia()
     
     return await getStudentActivityHistory(parseInt(user.id));
   })
-  
+
+.get('/student/registered-activities', async (ctx: CustomContext) => {
+  if (ctx.user.role !== 'student') {
+    ctx.set.status = 403;
+    return { success: false, message: 'Access denied' };
+  }
+
+  return await getMyRegisteredActivities(ctx);
+})
   // เพิ่ม route สำหรับดูรายละเอียดกิจกรรมที่ลงทะเบียน
   .get('/student/activity/:id', async ({ params, user }: CustomContext) => {
     if (user.role !== 'student') {
@@ -135,6 +155,7 @@ export const studentRoute = new Elysia()
         [user.id]
       );
       
+      
       // ดึงข้อมูลประเภทกิจกรรมและชั่วโมง/คะแนนตามประเภท
       const activityTypeStats = await pool.query(
         `SELECT a.activity_type,
@@ -148,6 +169,7 @@ export const studentRoute = new Elysia()
          ORDER BY activity_count DESC`,
         [user.id]
       );
+      
       
       return {
         success: true,
@@ -168,3 +190,5 @@ export const studentRoute = new Elysia()
       };
     }
   });
+
+  

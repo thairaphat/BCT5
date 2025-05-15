@@ -1,5 +1,5 @@
 import type { Context } from 'elysia';
-
+import type { JWTPayload } from '../utils/jwt';
 export type User = {
   id: number;
   name?: string;
