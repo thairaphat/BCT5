@@ -1,5 +1,5 @@
 import pool from '../../connect/db';
-
+import { Elysia } from 'elysia';
 export const createActivity = async (
   name: string,
   description: string,
@@ -44,7 +44,7 @@ export const createActivity = async (
         `INSERT INTO activities(name, activity_type, reg_deadline, created_by, status, max_participants, created_at, updated_at)
          VALUES($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
          RETURNING id, name, activity_type, reg_deadline, status, max_participants`,
-        [name, activity_type, reg_deadline, created_by, 'open', max_participants]
+        [name, activity_type, reg_deadline, created_by, 'pending', max_participants]
       );
 
       const activityId = activityResult.rows[0].id;
@@ -70,7 +70,7 @@ export const createActivity = async (
           start_date,
           end_date,
           reg_deadline,
-          status: 'open',
+          status: 'pending',
           max_participants,
           volunteer_hours,
           volunteer_points,
