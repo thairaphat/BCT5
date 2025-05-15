@@ -7,7 +7,8 @@ import {
   getActivityById,
   approveActivity,
   rejectActivity,
-  getActivityStats
+  getActivityStats,
+  getActivityTypes
 } from '../controller/admin/adminActivityController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
@@ -75,10 +76,16 @@ export const adminRoute = new Elysia()
         return await getPendingActivities();
       })
 
+      // เพิ่ม route ใหม่สำหรับดึงประเภทกิจกรรมทั้งหมด
+      .get('/activity-types', async () => {
+        return await getActivityTypes();
+      })
+
       // ดึงข้อมูลกิจกรรมทั้งหมด (สามารถกรองตาม status ได้)
       .get('/activities', async ({ query }) => {
         const status = query.status ? query.status.split(',') : undefined;
-        return await getAllActivities(status);
+        const activityTypes = query.activity_type ? query.activity_type.split(',') : undefined;
+        return await getAllActivities(status, activityTypes);
       })
 
       // ดึงรายละเอียดกิจกรรมตาม ID
