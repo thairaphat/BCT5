@@ -33,8 +33,8 @@ export const getPendingActivities = async () => {
   }
 };
 
-// ดึงข้อมูลกิจกรรมทั้งหมด สามารถกรองตาม status ได้
-export const getAllActivities = async (status?: string[]) => {
+// ดึงข้อมูลกิจกรรมทั้งหมด สามารถกรองตาม status และ activity_type ได้
+export const getAllActivities = async (status?: string[], activityTypes?: string[]) => {
   try {
     let query = `
       SELECT a.id, a.name, a.activity_type, a.reg_deadline, a.status, a.max_participants, 
@@ -48,13 +48,22 @@ export const getAllActivities = async (status?: string[]) => {
       JOIN activity_details ad ON a.id = ad.id_activity_details
       JOIN users u ON a.created_by = u.id_user
       JOIN user_details ud ON u.id_user_details = ud.id_user_details
+      WHERE 1=1
     `;
 
     const params: any[] = [];
+    let paramIndex = 1;
     
     if (status && status.length > 0) {
-      query += ' WHERE a.status = ANY($1)';
+      query += ` AND a.status = ANY($${paramIndex})`;
       params.push(status);
+      paramIndex++;
+    }
+    
+    if (activityTypes && activityTypes.length > 0) {
+      query += ` AND a.activity_type = ANY($${paramIndex})`;
+      params.push(activityTypes);
+      paramIndex++;
     }
 
     query += ' ORDER BY a.created_at DESC';
@@ -70,6 +79,31 @@ export const getAllActivities = async (status?: string[]) => {
     return {
       success: false,
       message: 'เกิดข้อผิดพลาดในการดึงข้อมูลกิจกรรม',
+      error: error instanceof Error ? error.message : String(error)
+    };
+  }
+};
+
+// ดึงประเภทกิจกรรมทั้งหมดที่มีอยู่ในระบบ
+export const getActivityTypes = async () => {
+  try {
+    const query = `
+      SELECT DISTINCT activity_type
+      FROM activities
+      ORDER BY activity_type
+    `;
+    
+    const result = await pool.query(query);
+
+    return {
+      success: true,
+      activityTypes: result.rows.map(row => row.activity_type)
+    };
+  } catch (error) {
+    console.error('Error fetching activity types:', error);
+    return {
+      success: false,
+      message: 'เกิดข้อผิดพลาดในการดึงข้อมูลประเภทกิจกรรม',
       error: error instanceof Error ? error.message : String(error)
     };
   }
