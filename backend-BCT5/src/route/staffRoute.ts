@@ -18,7 +18,7 @@ export const staffRoute = new Elysia()
   // ดึงข้อมูลกิจกรรมทั้งหมด
   
   .get('/activities', async ({ query }) => {
-    const status = query.status ? query.status.split(',') : ['open', 'closed', 'cancelled'];
+    const status = query.status ? query.status.split(',') : ['pending','approved','rejected','open', 'closed', 'cancelled'];
     return await getAllActivities(status);
   })
 
