@@ -1,9 +1,5 @@
 import pool from '../../connect/db';
 
-interface RoleToggleRequest {
-  id_user: number;
-}
-
 // ฟังก์ชันสำหรับ ban ผู้ใช้
 export const banUser = async (id_user: number) => {
   if (!id_user) {
