@@ -1,55 +1,119 @@
-import { Elysia } from 'elysia'
-import db from '../connect/db' // การเชื่อมต่อฐานข้อมูล
-import { authMiddleware } from '../middleware/authMiddleware'
+import { Elysia, t } from 'elysia';
+import { authMiddleware } from '../middleware/authMiddleware';
 
-const student = new Elysia()
-    .use(authMiddleware) // ใช้ middleware
-    .post('/join-activity/:activityId', async ({ params, user, set }) => {
-        if (!user || user.role !== 'student') {
-            set.status = 403
-            return { error: 'Unauthorized' }
-        }
+// import controller
+import { joinActivity, getStudentActivities } from '../controller/student/joinActivityController';
+import { 
+  getActivityParticipants, 
+  approveParticipant, 
+  rejectParticipant,
+  recordAttendance 
+} from '../controller/staff/manageParticipantsController';
 
-        const { activityId } = params
+// Student routes
+const studentRoutes = new Elysia()
+  .use(authMiddleware)
+  .post('/join-activity/:activityId', async ({ params, user, set }) => {
+    if (!user || !['student', 'staff'].includes(user.role)) {
+      set.status = 403;
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
 
-        // ตรวจสอบจำนวนผู้เข้าร่วมปัจจุบันกับ max_participants
-        const activity = await db.query(
-            'SELECT max_participants, (SELECT COUNT(*) FROM registrations WHERE activity_id = ?) as current FROM activities WHERE id = ?',
-            [activityId, activityId]
-        )
-        if (activity.rows[0].current >= activity.rows[0].max_participants) {
-            set.status = 400
-            return { error: 'Activity is full' }
-        }
-
-        // เพิ่มข้อมูลการสมัครของนิสิตลงใน registrations
-        const currentDate = new Date().toISOString() // ใช้เวลาปัจจุบัน (07:12 PM +07, May 15, 2025)
-        await db.query(
-            'INSERT INTO registrations (user_id, activity_id, registration_date, status, created_at, updated_at) ' +
-            'VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (user_id, activity_id) DO NOTHING',
-            [user.id, activityId, currentDate, 'pending', currentDate, currentDate]
-        )
-        return { success: true, message: 'สมัครเข้าร่วมกิจกรรมสำเร็จ', activityId }
+    const activity_id = parseInt(params.activityId);
+    return await joinActivity(parseInt(user.id), activity_id);
+  }, {
+    params: t.Object({
+      activityId: t.String()
     })
+  })
+  .get('/my-activities', async ({ user }) => {
+    if (!user) {
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
+    
+    return await getStudentActivities(parseInt(user.id));
+  });
 
-const staff = new Elysia()
-    .use(authMiddleware) // ใช้ middleware
-    .get('/activity-participants/:activityId', async ({ params, user, set }) => {
-        if (!user || user.role !== 'staff') {
-            set.status = 403
-            return { error: 'Unauthorized' }
-        }
+// Staff routes
+const staffRoutes = new Elysia()
+  .use(authMiddleware)
+  .get('/activity-participants/:activityId', async ({ params, user, set }) => {
+    if (!user || user.role !== 'staff') {
+      set.status = 403;
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
 
-        const { activityId } = params
-        const result = await db.query(
-            'SELECT u.user_id, u.first_name, u.last_name, r.status, r.registration_date, r.attended_date, r.points_earned, r.hours_earned ' +
-            'FROM user_details u JOIN registrations r ON u.user_id = r.user_id ' +
-            'WHERE r.activity_id = ?',
-            [activityId]
-        )
-        return { success: true, participants: result.rows }
+    const activity_id = parseInt(params.activityId);
+    return await getActivityParticipants(activity_id);
+  }, {
+    params: t.Object({
+      activityId: t.String()
     })
+  })
+  .post('/approve-participant/:registrationId', async ({ params, user, set }) => {
+    if (!user || user.role !== 'staff') {
+      set.status = 403;
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
 
+    const registration_id = parseInt(params.registrationId);
+    return await approveParticipant(registration_id, parseInt(user.id));
+  }, {
+    params: t.Object({
+      registrationId: t.String()
+    })
+  })
+  .post('/reject-participant/:registrationId', async ({ params, body, user, set }) => {
+    if (!user || user.role !== 'staff') {
+      set.status = 403;
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
+
+    const registration_id = parseInt(params.registrationId);
+    const { reason } = body as { reason: string };
+    
+    if (!reason || reason.trim() === '') {
+      return {
+        success: false,
+        message: 'กรุณาระบุเหตุผลในการปฏิเสธ'
+      };
+    }
+    
+    return await rejectParticipant(registration_id, parseInt(user.id), reason);
+  }, {
+    params: t.Object({
+      registrationId: t.String()
+    }),
+    body: t.Object({
+      reason: t.String()
+    })
+  })
+  .post('/record-attendance/:registrationId', async ({ params, body, user, set }) => {
+    if (!user || user.role !== 'staff') {
+      set.status = 403;
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
+
+    const registration_id = parseInt(params.registrationId);
+    const { hours_earned, points_earned, feedback } = body as { 
+      hours_earned: number, 
+      points_earned: number, 
+      feedback?: string 
+    };
+    
+    return await recordAttendance(registration_id, hours_earned, points_earned, feedback || '');
+  }, {
+    params: t.Object({
+      registrationId: t.String()
+    }),
+    body: t.Object({
+      hours_earned: t.Number(),
+      points_earned: t.Number(),
+      feedback: t.Optional(t.String())
+    })
+  });
+
+// Export combined routes
 export const routes = new Elysia()
-    .use(student)
-    .use(staff)
+  .group('/student', app => app.use(studentRoutes))
+  .group('/staff', app => app.use(staffRoutes));

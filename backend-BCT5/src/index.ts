@@ -7,7 +7,8 @@ import type { CustomContext } from './type/context';
 import { adminRoute } from './route/adminRoute';
 import { studentRoute } from './route/studentRoute';
 import { staffRoute } from './route/staffRoute';
-import { routes as activityRoutes } from './route/activityRoutes'
+import { routes as activityRoutes } from './route/activityRoutes';
+
 async function startApp() {
   try {
     const dbConnected = await testConnection();
@@ -17,7 +18,6 @@ async function startApp() {
     }
 
   const app = new Elysia()
-    
   .use(adminRoute)
   .use(loginRoute)
   .use(registerRoute)
