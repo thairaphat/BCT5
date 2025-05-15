@@ -1,5 +1,5 @@
 import pool from '../../connect/db';
-
+import { Elysia } from 'elysia';
 export const editActivity = async (
   activity_id: number,
   name: string,
@@ -32,7 +32,7 @@ export const editActivity = async (
 
     // ตรวจสอบว่ามีคนลงทะเบียนไปแล้วหรือไม่
     const registrationsResult = await pool.query(
-      'SELECT COUNT(*) as count FROM registrations WHERE id_activity = $1',
+      'SELECT COUNT(*) as count FROM registrations WHERE activity_id = $1',
       [activity_id]
     );
 

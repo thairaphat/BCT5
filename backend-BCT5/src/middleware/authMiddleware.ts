@@ -6,7 +6,7 @@ import { jwtSecret } from '../utils/secret';
 
 export const authMiddleware = (app: Elysia) =>
     app.derive(async ({ request, set }) => {
-        console.log('✅ authMiddleware called');
+        console.log(' authMiddleware called');
         const authHeader = request.headers.get('authorization');
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             set.status = 401;
@@ -14,10 +14,10 @@ export const authMiddleware = (app: Elysia) =>
         }
 
         const token = authHeader.split(' ')[1];
-        console.log('🛡️ verify-token:', token);
-        console.log('🔐 verify-secret:', Buffer.from(jwtSecret).toString('base64'));
+        console.log(' verify-token:', token);
+        console.log(' verify-secret:', Buffer.from(jwtSecret).toString('base64'));
         const { payload } = await jwtVerify(token, jwtSecret);
-        console.log('🧾 payload:', payload);
+        console.log(' payload:', payload);
 
         if (!isJWTPayload(payload)) {
             set.status = 403;

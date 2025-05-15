@@ -4,35 +4,32 @@ import { editActivity } from '../controller/staff/editActivities';
 import { closeActivity } from '../controller/staff/closeActivities';
 import { cancelActivity } from '../controller/staff/cancelActivities';
 import { getAllActivities, getActivityById } from '../controller/staff/getActivities';
-import type { CustomContext } from '../type/context';
+import { User } from '../type/type';
+import { authMiddleware } from '../middleware/authMiddleware';
+import {staffAuthMiddleware} from '../middleware/staffAuthMiddleware'
+type Context = {
+  user: User;
+};
 export const staffRoute = new Elysia()
+ .use(staffAuthMiddleware)
+ 
+  
+
   // ดึงข้อมูลกิจกรรมทั้งหมด
-   .get('/activities', async ({ query, set }) => {
-    const status = query.status?.split(',') || ['open', 'closed', 'cancelled'];
-
-    const result = await getAllActivities(status);
-
-    if (!result.success) {
-      set.status = 500;
-      return result;
-    }
-
-    return result;
+  
+  .get('/activities', async ({ query }) => {
+    const status = query.status ? query.status.split(',') : ['open', 'closed', 'cancelled'];
+    return await getAllActivities(status);
   })
-  .get('/activities/:id', async ({ params, set }) => {
-    const id = Number(params.id);
 
-    if (isNaN(id)) {
-      set.status = 400;
-      return { success: false, message: 'Invalid activity ID' };
-    }
-
-    const result = await getActivityById(id);
-    if (!result.success) {
-      set.status = 404;
-    }
-
-    return result;
+  // ดึงข้อมูลกิจกรรมตาม ID
+  .get('/activities/:id', async ({ params }) => {
+    const activity_id = parseInt(params.id);
+    return await getActivityById(activity_id);
+  }, {
+    params: t.Object({
+      id: t.String()
+    })
   })
 
   // สร้างกิจกรรมใหม่
