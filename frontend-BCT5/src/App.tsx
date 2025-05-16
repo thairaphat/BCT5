@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import MyActivities from "./pages/ActivityMe";
 import ActivityHistory from "./pages/ActivityHistory";
 import ActivityDetail from "./pages/ActivityDescript";
+import Profile from "./pages/Profile";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/activityMe" element={<MyActivities />} />
         <Route path="/activityHistory" element={<ActivityHistory />} />
         <Route path="/activityDescript" element={<ActivityDetail />} />
+        <Route path="/Profile" element={<Profile />} />
       </Route>
 
       <Route path="*" element={<div>ไม่พบหน้านี้</div>} />
