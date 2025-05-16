@@ -1,9 +1,10 @@
 // src/components/ProtectedRoute.tsx
 import { useAppSelector } from "../store/hooks";
 import { Navigate, useLocation } from "react-router-dom";
+import React from "react";
 
 interface Props {
-  children: JSX.Element;
+  children: React.ReactNode;
 }
 
 export default function ProtectedRoute({ children }: Props) {

@@ -25,13 +25,25 @@ const initialState: AuthState = {
   error: null,
 };
 
+interface User {
+  id: string;
+  name: string;
+  lastName: string;
+  email: string;
+  studentId: string;
+  faculty: string;
+  major: string;
+}
+
 // เพิ่มส่วนนี้ด้านบน ก่อน createSlice
 export const register = createAsyncThunk<
   User,
-  { name: string; email: string; password: string },
+  { name: string; lastName: string; email: string; password: string; studentId: string; faculty: string; major: string },
   { rejectValue: string }
->("auth/register", async ({ name, email, password }, { rejectWithValue }) => {
+>("auth/register", async (data, { rejectWithValue }) => {
   try {
+    const { name, lastName, email, password, studentId, faculty, major } = data;
+
     if (email === "demo@example.com") {
       return rejectWithValue("อีเมลนี้ถูกใช้ไปแล้ว");
     }
@@ -39,7 +51,11 @@ export const register = createAsyncThunk<
     const user: User = {
       id: Date.now().toString(),
       name,
+      lastName,
       email,
+      studentId,
+      faculty,
+      major,
     };
 
     localStorage.setItem("user", JSON.stringify(user));
@@ -57,14 +73,31 @@ export const login = createAsyncThunk<
   { email: string; password: string },
   { rejectValue: string }
 >("auth/login", async ({ email, password }, { rejectWithValue }) => {
-  if (email === "demo@example.com" && password === "password") {
-    const user = { id: "1", name: "Demo User", email };
-    localStorage.setItem("user", JSON.stringify(user));
-    return user;
-  } else {
-    return rejectWithValue("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+  try {
+    if (email === "demo@example.com" && password === "password") {
+      const user: User = {
+        id: "1",
+        name: "Demo User",
+        lastName: "Lastname", // ✅ อย่าลืมเพิ่ม field ใหม่
+        email,
+        studentId: "65041234",
+        faculty: "วิศวกรรมศาสตร์",
+        major: "คอมพิวเตอร์",
+      };
+
+      localStorage.setItem("user", JSON.stringify(user));
+      return user;
+    } else {
+      return rejectWithValue("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      return rejectWithValue(error.message);
+    }
+    return rejectWithValue("เกิดข้อผิดพลาด");
   }
 });
+
 
 export const logout = createAsyncThunk("auth/logout", async () => {
   localStorage.removeItem("user");
