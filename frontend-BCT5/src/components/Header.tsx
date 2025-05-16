@@ -38,14 +38,14 @@ export default function Header() {
         <div className="px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-              <img src="https://img5.pic.in.th/file/secure-sv1/1-01c3495c35b599cc7c.png" alt="logo" className=" w-12 pt-2"/>
-              <div className="text-xl font-bold text-white">VolunteerHub</div>
+            <img src="https://img5.pic.in.th/file/secure-sv1/1-01c3495c35b599cc7c.png" alt="logo" className=" w-12 pt-2"/>
+            <div className="text-xl font-bold text-white">VolunteerHub</div>
           </div>
 
           {/* Desktop Menu */}
           <nav className="hidden md:flex space-x-6 text-white font-semibold">
-              <a href="#" className="hover:bg-transparent">หน้าแรก</a>
-              <a href="#" className="hover:underline">กิจกรรม</a>
+            <a href="/" className="hover:bg-transparent">หน้าแรก</a>
+            <a href="/activityMe" className="hover:">กิจกรรม</a>
           </nav>
                 
           <div className="relative">

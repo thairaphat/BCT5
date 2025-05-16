@@ -24,30 +24,35 @@ export default function Dashboard() {
       {/* ฝั่งซ้าย - หมวดกิจกรรม */}
       <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { title: "อาสา", image: "/img/Card1.webp" },
-          { title: "ช่วยงาน", image: "/img/Card2.webp" },
-          { title: "อบรม", image: "/img/Card3.webp" },
-        ].map((item) => (
-          <div className="relative h-[280px] md:h-[320px] lg:h-[700px] rounded-xl overflow-hidden shadow group cursor-pointer">
-            {/* รูปหลัก */}
-            <img
-              src={item.image}
-              alt={item.title}
-              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-            />
+  { title: "อาสา", image: "/img/Card1.webp" },
+  { title: "ช่วยงาน", image: "/img/Card2.webp" },
+  { title: "อบรม", image: "/img/Card3.webp" },
+].map((item) => (
+  <div
+    key={item.title}
+    onClick={() => navigate(`/activityMe?type=${encodeURIComponent(item.title)}`)}
+    className="relative h-[280px] md:h-[320px] lg:h-[700px] rounded-xl overflow-hidden shadow group cursor-pointer"
+  >
+    {/* รูปหลัก */}
+    <img
+      src={item.image}
+      alt={item.title}
+      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+    />
 
-            {/* overlay ดำ (หายตอน hover) */}
-            <div className="absolute inset-0 bg-black/50 opacity-100 group-hover:opacity-0 transition-opacity duration-300 pointer-events-none" />
+    {/* overlay ดำ (หายตอน hover) */}
+    <div className="absolute inset-0 bg-black/50 opacity-100 group-hover:opacity-0 transition-opacity duration-300 pointer-events-none" />
 
-            {/* inner shadow อยู่ตลอด */}
-            <div className="absolute inset-0 shadow-[inset_0_-121px_20px_0_rgba(0,0,0,0.6)] pointer-events-none" />
+    {/* inner shadow อยู่ตลอด */}
+    <div className="absolute inset-0 shadow-[inset_0_-121px_20px_0_rgba(0,0,0,0.6)] pointer-events-none" />
 
-            {/* ข้อความบนรูป */}
-            <div className="absolute bottom-9 left-1/2 transform -translate-x-1/2 text-white text-5xl font-bold drop-shadow-lg z-10">
-              {item.title}
-            </div>
-          </div>
-        ))}
+    {/* ข้อความบนรูป */}
+    <div className="absolute bottom-9 left-1/2 transform -translate-x-1/2 text-white text-5xl font-bold drop-shadow-lg z-10">
+      {item.title}
+    </div>
+  </div>
+))}
+
       </div>
 
       {/* ฝั่งขวา */}
@@ -58,7 +63,7 @@ export default function Dashboard() {
           <img
             src="/img/info1.jpg"
             alt="กิจกรรม"
-            className="rounded-md mb-3"
+            className="rounded-md mb-3 w-full"
           />
           <p className="text-sm font-semibold text-yellow-600">
             “รู้ทันภัยพิบัติ: น้ำท่วมและการรับมือในเขตเมือง”
