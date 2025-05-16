@@ -504,7 +504,7 @@ export default function ActivityHistory() {
         max={totalPages}
         value={currentPage}
         onChange={(e) =>
-          setCurrentPage(Math.min(Math.max(Number(e.target.value), 1), totalPages))
+          setCurrentPage(Math.min(Math.max(Number(e.target.value), 1), totalPages))    
         }
         className="w-14 px-2 py-1 border rounded text-center"
       />

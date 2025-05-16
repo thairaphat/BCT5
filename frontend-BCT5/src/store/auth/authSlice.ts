@@ -78,7 +78,7 @@ export const login = createAsyncThunk<
       const user: User = {
         id: "1",
         name: "Demo User",
-        lastName: "Lastname", // ✅ อย่าลืมเพิ่ม field ใหม่
+        lastName: "Lastname",
         email,
         studentId: "65041234",
         faculty: "วิศวกรรมศาสตร์",

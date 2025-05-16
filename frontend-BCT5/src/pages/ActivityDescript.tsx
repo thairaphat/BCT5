@@ -22,7 +22,7 @@ export default function ActivityDetail() {
         {/* Box: สถานะ */}
         <div className="space-y-2 text-sm">
           <div className="flex items-start gap-2">
-            <span>⭐</span>
+            <span>⭐</span> 
             <span>
               <span className="font-semibold">สถานะกิจกรรม</span>:{" "}
               <span className="text-green-600 font-semibold">เปิดการลงทะเบียน</span>
