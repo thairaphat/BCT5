@@ -3,11 +3,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
-
-// หน้าหลักหลัง login
-function HomePage() {
-  return <div>🎉 ยินดีต้อนรับเข้าสู่ระบบ!</div>;
-}
+import Dashboard from "./pages/Dashboard";
 
 export default function App() {
   return (
@@ -23,8 +19,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<HomePage />} />
-        {/* เพิ่มหน้าอื่นๆ ได้ที่นี่ เช่น <Route path="dashboard" element={<Dashboard />} /> */}
+        <Route index element={<Dashboard />} />
       </Route>
 
       <Route path="*" element={<div>ไม่พบหน้านี้</div>} />
