@@ -9,6 +9,7 @@ import ActivityHistory from "./pages/ActivityHistory";
 import ActivityDetail from "./pages/ActivityDescript";
 import Profile from "./pages/Profile";
 import ActivityAll from "./pages/ActivityAll";
+import DashboardStaff from "./pages/DashboardStaff";
 
 export default function App() {
   return (
@@ -30,6 +31,8 @@ export default function App() {
         <Route path="/activityDescript" element={<ActivityDetail />} />
         <Route path="/activityAll" element={<ActivityAll />} />
         <Route path="/Profile" element={<Profile />} />
+
+        <Route path="/dashboardStaff" element={<DashboardStaff />} />
       </Route>
 
       <Route path="*" element={<div>ไม่พบหน้านี้</div>} />
