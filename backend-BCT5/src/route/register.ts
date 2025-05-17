@@ -8,16 +8,16 @@ export const registerRoute = new Elysia()
     const { 
       student_id, 
       password, 
-      firstname, 
-      lastname, 
+      first_name, 
+      last_name, 
       email, 
       faculty_id, 
       department_id 
     } = body as { 
       student_id: string, 
       password: string, 
-      firstname: string, 
-      lastname: string, 
+      first_name: string, 
+      last_name: string, 
       email: string, 
       faculty_id: number, 
       department_id: number 
@@ -26,8 +26,8 @@ export const registerRoute = new Elysia()
     return await registerUser(
       student_id, 
       password, 
-      firstname, 
-      lastname, 
+      first_name, 
+      last_name, 
       email,
       faculty_id, 
       department_id
@@ -36,8 +36,8 @@ export const registerRoute = new Elysia()
     body: t.Object({
       student_id: t.String(),
       password: t.String(),
-      firstname: t.String(),
-      lastname: t.String(),
+      first_name: t.String(),
+      last_name: t.String(),
       email: t.String(),
       faculty_id: t.Number(),
       department_id: t.Number()

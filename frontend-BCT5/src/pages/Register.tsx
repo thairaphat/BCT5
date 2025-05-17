@@ -12,8 +12,8 @@ import {
 } from "react-icons/fi";
 
 export default function Register() {
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
+  const [first_name, setfirst_name] = useState("");
+  const [last_name, setlast_name] = useState("");
   const [student_id, setStudent_id] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -103,8 +103,8 @@ export default function Register() {
         body: JSON.stringify({
           student_id: student_id,
           password: password,
-          firstname: firstname,
-          lastname: lastname,
+          first_name: first_name,
+          last_name: last_name,
           email: email,
           faculty_id: parseInt(faculty_id) || 0,
           department_id: parseInt(department_id) || 0
@@ -174,17 +174,17 @@ export default function Register() {
               <div className="flex">
                 <div>
                   <label
-                    htmlFor="firstname"
+                    htmlFor="first_name"
                     className="block text-gray-700 font-medium mb-2 flex items-center"
                   >
                     <FiUser className="mr-2 text-primary" />
                     ชื่อ
                   </label>
                   <input
-                    id="firstname"
+                    id="first_name"
                     type="text"
-                    value={firstname}
-                    onChange={(e) => setFirstname(e.target.value)}
+                    value={first_name}
+                    onChange={(e) => setfirst_name(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none"
                     placeholder="ชื่อ"
                     required
@@ -193,17 +193,17 @@ export default function Register() {
 
                 <div>
                   <label
-                    htmlFor="lastname"
+                    htmlFor="last_name"
                     className="block text-gray-700 font-medium mb-2 flex items-center"
                   >
                     <FiUser className="mr-2 text-primary" />
                     นามสกุล
                   </label>
                   <input
-                    id="lastname"
+                    id="last_name"
                     type="text"
-                    value={lastname}
-                    onChange={(e) => setLastname(e.target.value)}
+                    value={last_name}
+                    onChange={(e) => setlast_name(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none ml-2"
                     placeholder="นามสกุล"
                     required
