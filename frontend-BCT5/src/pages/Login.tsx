@@ -12,7 +12,7 @@ interface LocationState {
 }
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [studentId, setStudentId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const dispatch = useAppDispatch();
@@ -29,7 +29,7 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await dispatch(login({ email, password })).unwrap();
+      await dispatch(login({ studentId, password })).unwrap();
       navigate("/");
     } catch (err) {
       console.error("Login failed:", err);
@@ -42,7 +42,7 @@ export default function Login() {
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
           <div className="p-6">
             <p className=" text-black mt-1 flex">
-              Welcome to <p className="text-primary">&nbsp;VolunteerHub</p>
+              Welcome to <span className="text-primary">&nbsp;VolunteerHub</span>
             </p>
             <h2 className="text-5xl font-bold text-black">Sign in</h2>
           </div>
@@ -65,10 +65,10 @@ export default function Login() {
                   Enter your username or  student id
                 </label>
                 <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="studentId"
+                  type="text"
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none"
                   placeholder="Username or student id"
                   required
