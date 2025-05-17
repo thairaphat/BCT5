@@ -82,7 +82,7 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     await dispatch(logout());
-    navigate("/login");a
+    navigate("/login");
   };
 
   useEffect(() => {
