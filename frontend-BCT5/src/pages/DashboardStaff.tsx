@@ -22,9 +22,6 @@ export default function DashboardStaff() {
     <div>
         <div className="mb-9 flex justify-end px-9">
             <SearchBox value={searchTerm} onChange={setSearchTerm} />
-            <div>
-              <h1>ddd</h1>
-            </div>
         </div>
         <div className="p-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
 

@@ -17,12 +17,11 @@ export default function Layout() {
   };
 
   return (
-    <div>
-      <Header />
-      {/* Main content */}
-      <main className="p-6">
-        <Outlet />
-      </main>
-    </div>
-  );
+  <div className="min-h-screen bg-white text-black dark:bg-[#181818] dark:text-white transition-colors duration-300">
+    <Header />
+    <main className="p-6">
+      <Outlet />
+    </main>
+  </div>
+);
 }
