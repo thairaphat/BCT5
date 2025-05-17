@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { testConnection } from "./connect/db";
+import cors from "@elysiajs/cors";
 import { loginRoute } from "./route/LoginRoute";
 import { registerRoute } from "./route/register";
 import { authMiddleware } from './middleware/authMiddleware';
@@ -9,7 +10,6 @@ import { studentRoute } from './route/studentRoute';
 import { staffRoute } from './route/staffRoute';
 import { notificationRoutes } from './route/notificationRoutes';
 import { routes as activityRoutes } from './route/activityRoutes';
-import { cors } from "@elysiajs/cors";
 
 async function startApp() {
   try {
@@ -20,11 +20,20 @@ async function startApp() {
     }
 
   const app = new Elysia()
+  // .use(cors({
+  //       origin: "http://localhost:5173",  // กำหนด frontend origin ที่อนุญาต
+  //       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  //       credentials: true // ถ้าใช้ cookie หรือ auth
+  // }))
+  // .use(adminRoute)
+  // .use(loginRoute)
+  // .use(registerRoute)
+  // .use(studentRoute) 
+  // .use(activityRoutes)
     .use(cors({
-        origin: "http://localhost:5173",  // กำหนด frontend origin ที่อนุญาต
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        credentials: true // ถ้าใช้ cookie หรือ auth
-  }))
+        origin: ['http://localhost:5173', 'http://localhost:5174'],
+        credentials: true                
+      }))
   .group('/api', app => {
     return app
       .use(adminRoute)
