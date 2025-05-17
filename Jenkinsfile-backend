@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_REGISTRY = 'docker.io/zaserzafear'
+        IMAGE_NAME = 'bct5-backend'
+        IMAGE_TAG = "v${env.BUILD_NUMBER}"
+        GIT_REPO = 'git@github.com:thairaphat/BCT5.git'
+        DEPLOY_YML = 'kube-manifest/app/backend/deployment.yml'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: "${GIT_REPO}", branch: 'main'
+            }
+        }
+
+        stage('Build and Push Backend Image') {
+            steps {
+                dir('backend-BCT5') {
+                    sh """
+                        docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} .
+                        docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                    """
+                }
+            }
+        }
+
+        stage('Update Manifest with yq') {
+            steps {
+                sh """
+                    docker run --rm --user root -v "\$PWD/${DEPLOY_YML}:/workdir/${DEPLOY_YML}" \\
+                      mikefarah/yq eval --prettyPrint -i '
+                        .spec.template.spec.containers[0].image = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+                      ' /workdir/${DEPLOY_YML}
+                """
+            }
+        }
+
+        stage('Commit and Push') {
+            steps {
+                sh """
+                    git config user.email "jenkins@ci"
+                    git config user.name "Jenkins CI"
+                    git add ${DEPLOY_YML}
+                    git commit -m "Update backend image to ${IMAGE_TAG}"
+                    git push origin release/prod
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Backend pipeline completed."
+        }
+    }
+}
