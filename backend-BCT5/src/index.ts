@@ -27,9 +27,9 @@ async function startApp() {
       .use(adminRoute)
       .use(loginRoute)
       .use(registerRoute)
+      .use(staffRoute) 
       .use(studentRoute) 
       .use(activityRoutes)
-      .use(staffRoute) 
       .use(authMiddleware)
       .get('/profile', ({ user }: CustomContext) => {
         return `hello, user ${user.id}`;

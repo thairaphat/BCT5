@@ -78,9 +78,10 @@ export const getStudentActivityDetail = async (user_id: number, activity_id: num
   try {
     // ตรวจสอบว่านักศึกษาลงทะเบียนกิจกรรมนี้หรือไม่
     const registrationCheck = await pool.query(
-      `SELECT * 
-       FROM registrations 
-       WHERE user_id = $1 AND activity_id = $2`,
+      `SELECT r.registration_id, s.status_name
+       FROM registrations r
+       JOIN status_check s ON r.status_check_id = s.id
+       WHERE r.user_id = $1 AND r.activity_id = $2`,
       [user_id, activity_id]
     );
 
@@ -91,13 +92,37 @@ export const getStudentActivityDetail = async (user_id: number, activity_id: num
       };
     }
 
+    const registration = registrationCheck.rows[0];
+    
+    // ถ้าสถานะเป็น 'rejected' ให้ดึงข้อมูลการปฏิเสธเพิ่มเติม
+    let rejectionInfo = null;
+    if (registration.status_name === 'rejected') {
+      const rejectionResult = await pool.query(
+        `SELECT rr.reason, rr.rejected_at,
+                u.student_id as rejected_by_student_id,
+                ud.first_name as rejected_by_first_name, 
+                ud.last_name as rejected_by_last_name
+         FROM registration_rejections rr
+         JOIN users u ON rr.rejected_by = u.id_user
+         JOIN user_details ud ON u.id_user_details = ud.id_user_details
+         WHERE rr.registration_id = $1
+         ORDER BY rr.rejected_at DESC
+         LIMIT 1`,
+        [registration.registration_id]
+      );
+      
+      if (rejectionResult.rows.length > 0) {
+        rejectionInfo = rejectionResult.rows[0];
+      }
+    }
+
     // ดึงข้อมูลกิจกรรมพร้อมรายละเอียด
     const activityResult = await pool.query(
-      `SELECT a.id, a.name, a.activity_type, a.reg_deadline, a.status as activity_status, 
+      `SELECT a.id, a.name, a.activity_type, a.reg_deadline, s2.status_name as activity_status, 
               a.max_participants, a.created_at, a.updated_at, a.created_by,
               ad.description, ad.location, ad.start_date, ad.end_date, 
               ad.volunteer_hours, ad.volunteer_points,
-              r.registration_id, r.status as registration_status, 
+              r.registration_id, s.status_name as registration_status, 
               r.registration_date, r.attended_date, r.points_earned, r.hours_earned, r.feedback,
               u.student_id as creator_student_id,
               ud.first_name as creator_first_name, 
@@ -105,9 +130,11 @@ export const getStudentActivityDetail = async (user_id: number, activity_id: num
        FROM activities a
        JOIN activity_details ad ON a.id = ad.id_activity_details
        JOIN registrations r ON a.id = r.activity_id AND r.user_id = $1
+       JOIN status_check s ON r.status_check_id = s.id
+       JOIN status_check s2 ON a.status_check_id = s2.id
        JOIN users u ON a.created_by = u.id_user
        JOIN user_details ud ON u.id_user_details = ud.id_user_details
-       WHERE a.id = $2`,
+       WHERE a.id = $2 AND a.is_deleted = FALSE`,
       [user_id, activity_id]
     );
 
@@ -121,8 +148,9 @@ export const getStudentActivityDetail = async (user_id: number, activity_id: num
     // ดึงข้อมูลจำนวนผู้เข้าร่วมทั้งหมด
     const participantsCount = await pool.query(
       `SELECT COUNT(*) as total_participants 
-       FROM registrations 
-       WHERE activity_id = $1 AND status IN ('approved', 'attended')`,
+       FROM registrations r
+       JOIN status_check s ON r.status_check_id = s.id
+       WHERE r.activity_id = $1 AND s.status_name IN ('approved', 'in-process', 'passed', 'failed')`,
       [activity_id]
     );
 
@@ -132,7 +160,8 @@ export const getStudentActivityDetail = async (user_id: number, activity_id: num
       activity: {
         ...activityResult.rows[0],
         total_participants: participantsCount.rows[0].total_participants
-      }
+      },
+      rejectionInfo
     };
   } catch (error) {
     console.error('Error fetching student activity detail:', error);
