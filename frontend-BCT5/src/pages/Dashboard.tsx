@@ -225,35 +225,6 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* กิจกรรมล่าสุด */}
-          <Card className="p-4">
-            <h2 className="text-xl font-bold mb-3 text-center">กิจกรรมล่าสุดของฉัน</h2>
-            {latestActivity ? (
-              <>
-                <img
-                  src={latestActivity.image}
-                  alt={latestActivity.name}
-                  className="rounded-md mb-3 w-full"
-                />
-                <p className="text-sm font-semibold text-yellow-600">
-                  "{latestActivity.name}"
-                </p>
-                <p className="text-sm text-gray-600 mt-2 line-clamp-4">
-                  {latestActivity.description}
-                </p>
-                <p className="text-sm text-gray-500 mt-2">โดย {latestActivity.author}</p>
-
-                <button 
-                  onClick={() => navigate("/activityMe")}
-                  className="mt-3 w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-1.5 rounded">
-                  ดูรายละเอียดเพิ่มเติม
-                </button>
-              </>
-            ) : (
-              <p>กำลังโหลดข้อมูลกิจกรรมล่าสุด...</p>
-            )}
-          </Card>
-
           {/* การแจ้งเตือนล่าสุด */}
           <Card className="p-4">
             <h2 className="text-xl font-bold mb-3">การแจ้งเตือนล่าสุดของฉัน</h2>
