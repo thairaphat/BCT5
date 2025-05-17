@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { testConnection } from "./connect/db";
+import cors from "@elysiajs/cors";
 import { loginRoute } from "./route/LoginRoute";
 import { registerRoute } from "./route/register";
 import { authMiddleware } from './middleware/authMiddleware';
@@ -17,7 +18,10 @@ async function startApp() {
     }
 
   const app = new Elysia()
-  
+    .use(cors({
+        origin: 'http://localhost:5173', 
+        credentials: true                
+      }))
   .group('/api', app => {
     return app
       .use(adminRoute)
