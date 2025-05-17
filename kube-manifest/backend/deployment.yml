@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: backendapi
+  name: backendapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backendapi
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 4
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: backendapi
+    spec:
+      terminationGracePeriodSeconds: 75
+      containers:
+        - name: backendapi
+          image: zaserzafear/btc5-api:2
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              name: http-port
+          env:
+            - name: DB_HOST
+              value: "141.98.18.172"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "citizix_db"
+            - name: DB_USER
+              value: "citizix_user"
+            - name: DB_PASSWORD
+              value: "12345"

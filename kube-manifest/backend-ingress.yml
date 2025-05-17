@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backendapi
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: btc5.thiraphat.online
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: /backendapi(/|$)(.*)
+            backend:
+              service:
+                name: backendapi
+                port:
+                  number: 80
