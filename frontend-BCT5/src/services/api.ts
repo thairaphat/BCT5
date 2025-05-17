@@ -3,8 +3,9 @@ import axios from "axios";
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const api = axios.create({
   baseURL: apiBaseUrl,
-const apiClient = axios.create({
-  baseURL: " https://btc5.thiraphat.online/backendapi/api",
+
+// const apiClient = axios.create({
+//   baseURL: " https://btc5.thiraphat.online/backendapi/api",
   headers: {
     "Content-Type": "application/json",
   },
