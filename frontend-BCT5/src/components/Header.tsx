@@ -1,16 +1,16 @@
 // components/Header.tsx
-import { Outlet, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {  useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../store/hooks";
 import { logout } from "../store/auth/authSlice";
 import { useState } from "react";
-import { FiMenu, FiX, FiBell, FiChevronDown} from "react-icons/fi";
+import { FiMenu, FiX,  FiChevronDown} from "react-icons/fi";
 import { MdLightMode } from "react-icons/md";
-import logo from '../assets/dd1.png';
+// import logo from '../assets/dd1.png';
 
 export default function Header() {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const user = useAppSelector((state) => state.auth.currentUser);
+    // const user = useAppSelector((state) => state.auth.currentUser);
 
     const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
