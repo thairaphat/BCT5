@@ -1,5 +1,6 @@
 import pool from '../../connect/db';
 import { Elysia } from 'elysia';
+import { closeAndAssignPoints } from './closeAndAssignPoints';
 
 export const closeActivity = async (activity_id: number, closed_by: number) => {
   console.log('ปิดกิจกรรม id:', activity_id, 'user:', closed_by);

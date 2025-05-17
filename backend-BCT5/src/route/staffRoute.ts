@@ -137,20 +137,25 @@ export const staffRoute = new Elysia()
   })
 
   // ปิดกิจกรรม
-  .patch('/activities/:id/close', async ({ params, user }) => {
-    if (!user || user.role !== 'staff') {
-      return {
-        success: false,
-        message: 'ไม่มีสิทธิ์ในการปิดกิจกรรม'
-      };
-    }
+  .patch('/activities/:id/close', async ({ params, body, user }) => {
+  if (!user || user.role !== 'staff') {
+    return {
+      success: false,
+      message: 'ไม่มีสิทธิ์ในการปิดกิจกรรม'
+    };
+  }
 
-    const activity_id = parseInt(params.id);
-    return await closeActivity(activity_id, user.id);
-  }, {
-    params: t.Object({
-      id: t.String()
-    })
+  const activity_id = parseInt(params.id);
+  const { staff_note } = body as { staff_note?: string };
+  
+  return await closeActivity(activity_id, user.id, staff_note || '');
+    }, {
+      params: t.Object({
+        id: t.String()
+      }),
+      body: t.Object({
+        staff_note: t.Optional(t.String())
+      })
   })
   // ยกเลิกกิจกรรม
  .patch('/activities/:id/cancel', async ({ params, body, user }) => {
