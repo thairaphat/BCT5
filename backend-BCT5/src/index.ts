@@ -8,6 +8,8 @@ import { adminRoute } from './route/adminRoute';
 import { studentRoute } from './route/studentRoute';
 import { staffRoute } from './route/staffRoute';
 import { routes as activityRoutes } from './route/activityRoutes';
+import { cors } from "@elysiajs/cors";
+
 async function startApp() {
   try {
     const dbConnected = await testConnection();
@@ -17,6 +19,11 @@ async function startApp() {
     }
 
   const app = new Elysia()
+  .use(cors({
+        origin: "http://localhost:5173",  // กำหนด frontend origin ที่อนุญาต
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        credentials: true // ถ้าใช้ cookie หรือ auth
+  }))
   .use(adminRoute)
   .use(loginRoute)
   .use(registerRoute)
