@@ -27,6 +27,7 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(handleSubmit);
     try {
       await dispatch(login({ studentId, password })).unwrap();
       navigate("/");
