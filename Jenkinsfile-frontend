@@ -1,0 +1,75 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_REGISTRY = 'docker.io/zaserzafear'
+        IMAGE_NAME = 'bct5-frontend'
+        IMAGE_TAG = "v${env.BUILD_NUMBER}"
+        GIT_REPO = 'git@github.com:thairaphat/BCT5.git'
+        DEPLOY_YML = 'kube-manifest/app/frontend/deployment.yml'
+    }
+
+    options {
+        // This is required if you want to clean before build
+        skipDefaultCheckout(true)
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Clean before build
+                cleanWs()
+                // We need to explicitly checkout from SCM here
+                checkout scm
+                script {
+                    def BRANCH_NAME = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    echo "✅ Guessed branch: ${BRANCH_NAME}"
+                    // Store in env if needed later
+                    env.BRANCH_NAME = BRANCH_NAME
+                }
+            }
+        }
+
+        stage('Build and Push frontend Image') {
+            steps {
+                dir('frontend-BCT5') {
+                    sh """
+                        docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} .
+                        docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                    """
+                }
+            }
+        }
+
+        stage('Update Manifest with yq') {
+            steps {
+                sh """
+                    docker run --rm --user root -v "\$PWD/${DEPLOY_YML}:/workdir/${DEPLOY_YML}" \\
+                      mikefarah/yq eval --prettyPrint -i '
+                        .spec.template.spec.containers[0].image = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+                      ' /workdir/${DEPLOY_YML}
+                """
+            }
+        }
+
+        stage('Commit and Push') {
+            steps {
+                script {
+                    sh """
+                        git config user.email "jenkins@ci"
+                        git config user.name "Jenkins CI"
+                        git add ${DEPLOY_YML}
+                        git commit -m "Update frontend image to ${IMAGE_TAG}" || echo "No changes to commit"
+                        git push origin ${BRANCH_NAME}
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ frontend pipeline completed successfully on branch '${BRANCH_NAME}'."
+        }
+    }
+}

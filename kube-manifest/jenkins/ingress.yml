@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenkins
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  rules:
+    - host: btc5-jenkins.thiraphat.online
+      http:
+        paths:
+          - pathType: Prefix
+            backend:
+              service:
+                name: jenkins
+                port:
+                  number: 8080
+            path: /
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jenkins
+  name: jenkins
+spec:
+  type: ExternalName
+  externalName: node78964-env-6528313.th2.proen.cloud
