@@ -9,9 +9,17 @@ pipeline {
         DEPLOY_YML = 'kube-manifest/app/backend/deployment.yml'
     }
 
+    options {
+        // This is required if you want to clean before build
+        skipDefaultCheckout(true)
+    }
+
     stages {
         stage('Checkout') {
             steps {
+                // Clean before build
+                cleanWs()
+                // We need to explicitly checkout from SCM here
                 checkout scm
                 script {
                     BRANCH_NAME = sh(script: "git for-each-ref --format='%(refname:short)' refs/heads/ | head -n 1", returnStdout: true).trim()
