@@ -1,7 +1,11 @@
 import React from "react";
 import SearchBox from "../components/SearchBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { fetchActivities } from "../services/api";
+import { FaFolderOpen, FaTimesCircle, FaRegCalendarAlt } from "react-icons/fa"; 
+
 
 const tabs = [
   "อยู่ระหว่างกิจกรรม",
@@ -30,54 +34,20 @@ const getStatusColorClass = (status: string) => {
   }
 };
 
-const activities = [
-    {
-      title: "อบรมความปลอดภัยเบื้องต้น",
-      dateRange: "1 พ.ค. 2568 - 5 พ.ค. 2568",
-      status: "ผ่านกิจกรรม",
-      type: "อบรม",
-      image: "/img/train1.jpg",
-    },
-    {
-      title: "ช่วยงานเก็บขยะชายหาด",
-      dateRange: "10 พ.ค. 2568 - 12 พ.ค. 2568",
-      status: "อยู่ในระหว่างการอบรม",
-      type: "ช่วยงาน",
-      image: "/img/work1.jpg",
-    },
-    {
-      title: "กิจกรรมปลูกป่า",
-      dateRange: "20 พ.ค. 2568 - 21 พ.ค. 2568",
-      status: "ยกเลิกการลงทะเบียน",
-      type: "อาสา",
-      image: "/img/volunteer1.jpg",
-    },
-    {
-      title: "เวิร์กช็อปปฐมพยาบาล",
-      dateRange: "15 มิ.ย. 2568 - 18 มิ.ย. 2568",
-      status: "อยู่ในระหว่างการอบรม",
-      type: "อบรม",
-      image: "/img/train2.jpg",
-    },
-    {
-      title: "ช่วยงานจัดบูธมหกรรมสิ่งแวดล้อม",
-      dateRange: "5 มิ.ย. 2568 - 7 มิ.ย. 2568",
-      status: "ผ่านกิจกรรม",
-      type: "ช่วยงาน",
-      image: "/img/work2.jpg",
-    },
-    {
-      title: "วิ่งการกุศลเพื่อผู้ป่วยโรคเรื้อรัง",
-      dateRange: "28 พ.ค. 2568",
-      status: "ไม่ผ่านกิจกรรม",
-      type: "อาสา",
-      image: "/img/volunteer2.jpg",
-    },
-];
+interface ActivityType {
+  title: string;
+  dateRange: string;
+  status: string;
+  type: string;
+  image?: string;
+}
 
 export default function MyActivities() {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchParams] = useSearchParams();
+    const [activityList, setActivityList] = useState<ActivityType[]>([]);
+    const [loading, setLoading] = useState(true);
+
     const navigate = useNavigate();
 
     const type = searchParams.get("type") || "ทั้งหมด";
@@ -92,11 +62,47 @@ export default function MyActivities() {
         }
     };
 
-    const filteredActivities = activities.filter((item) => {
-        const matchType = type === "ทั้งหมด" || item.type === type;
-        const matchStatus = !status || status === "ทั้งหมด" || item.status === status;
-        return matchType && matchStatus;
-    });
+    useEffect(() => {
+  async function loadActivities() {
+    try {
+      const response = await fetchActivities();
+      setActivityList(response); // หรือ response.activities ขึ้นกับโครงสร้าง API ของคุณ
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  loadActivities();
+}, []);
+
+useEffect(() => {
+  async function fetchActivities() {
+      try {
+        const response = await axios.get("/api/activities"); 
+        // ตรวจสอบ response.data.activities
+        if (response.data && Array.isArray(response.data.activities)) {
+          setActivityList(response.data.activities);
+        } else {
+          setActivityList([]);
+          console.warn("API returned unexpected activities format", response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch activities", error);
+        setActivityList([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchActivities();
+  }, []);
+
+  const filteredActivities = activityList.filter((item) => {
+    const matchType = type === "ทั้งหมด" || item.type === type;
+    const matchStatus = !status || status === "ทั้งหมด" || item.status === status;
+    const matchSearch = item.title.includes(searchTerm) || item.type.includes(searchTerm);
+    return matchType && matchStatus && (searchTerm ? matchSearch : true);
+  });
 
     return (
         <div className="max-w-5xl mx-auto py-10 px-4 pt-0">
@@ -111,16 +117,20 @@ export default function MyActivities() {
                       กิจกรรมประเภท: <span className="text-yellow-600">{type}</span>
                     </h1>
                     <select
-                      className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      value={type}
-                      onChange={handleChange}
-                    >
-                      {activityTypes.map((t) => (
-                        <option key={t} value={t}>
-                          {t}
-                        </option>
-                      ))}
-                    </select>
+  className="border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 bg-white dark:bg-[#2c2c2c] text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+  value={type}
+  onChange={handleChange}
+>
+  {activityTypes.map((t) => (
+    <option
+      key={t}
+      value={t}
+      className="text-black dark:text-white bg-white dark:bg-[#2c2c2c]"
+    >
+      {t}
+    </option>
+  ))}
+</select>
                 </div>
             </div>
 
@@ -146,9 +156,13 @@ export default function MyActivities() {
                     </button>
                 ))}
             </div>
-
-            {/* Activity Cards */}
-            {filteredActivities.map((activity, idx) => (
+{/* Activity Cards */}
+            {loading ? (
+  <p className="text-center py-10">กำลังโหลดกิจกรรม...</p>
+) : filteredActivities.length === 0 ? (
+  <p className="text-center py-10">ไม่พบกิจกรรมที่ตรงกับเงื่อนไข</p>
+) : (
+  filteredActivities.map((activity, idx) => (
                 <div
                 key={idx}
                 className="flex flex-col md:flex-row bg-white border rounded-lg shadow-md mb-6 overflow-hidden transition-shadow hover:shadow-lg"
@@ -168,21 +182,45 @@ export default function MyActivities() {
                       )}
                     </div>
 
-                    {/* Details */}
-                    <div className="md:w-3/4 p-4 flex flex-col justify-between">
-                        <div>
-                            <h2 className="text-lg font-semibold mb-1">{activity.title}</h2>
-                            <p className="text-sm text-gray-500 flex items-center gap-1">
-                              📅 {activity.dateRange}
-                            </p>
-                            <p className="text-sm mt-2">
-                              <span className="font-semibold">สถานะ:</span>{" "}
-                              <span className={getStatusColorClass(activity.status)}>{activity.status}</span>
-                            </p>
-                            <p className="text-sm mt-2 text-gray-500">
-                              ประเภทกิจกรรม: <span className="text-gray-700">{activity.type}</span>
-                            </p>
-                        </div>
+            {/* Activity Cards */}
+            {filteredActivities.map((activity, idx) => (
+  <div
+    key={idx}
+    className="flex flex-col md:flex-row bg-white dark:bg-[#1f1f1f] text-black dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg shadow-md mb-6 overflow-hidden transition-shadow hover:shadow-lg"
+  >
+    {/* Thumbnail */}
+    <div className="md:w-1/4 w-full h-48 md:h-auto">
+      {activity.image ? (
+        <img
+          src={activity.image}
+          alt={activity.title}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div className="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 text-sm">
+          ไม่มีภาพ
+        </div>
+      )}
+    </div>
+
+    {/* Details */}
+    <div className="md:w-3/4 p-4 flex flex-col justify-between">
+      <div>
+        <h2 className="text-lg font-semibold mb-1">{activity.title}</h2>
+        <p className="text-sm text-gray-500 flex items-center gap-2">
+          <FaRegCalendarAlt className="text-base text-red-500" />
+          {activity.dateRange}
+        </p>
+        <p className="text-sm mt-2">
+          <span className="font-semibold">สถานะ:</span>{" "}
+          <span className={getStatusColorClass(activity.status)}>
+            {activity.status}
+          </span>
+        </p>
+        <p className="text-sm mt-2 text-gray-500 dark:text-gray-400">
+          ประเภทกิจกรรม: <span className="text-gray-700 dark:text-gray-200">{activity.type}</span>
+        </p>
+      </div>
 
                         {/* Buttons */}
                         <div className="mt-4 flex flex-wrap gap-2">
@@ -195,7 +233,25 @@ export default function MyActivities() {
                         </div>
                     </div>
                 </div>
-            ))}
+            ))
+)}
+
+
+            
+      {/* Buttons */}
+      <div className="mt-4 flex flex-wrap gap-2">
+  <button className="flex items-center gap-2 bg-cyan-100 text-cyan-700 px-3 py-1 rounded hover:bg-cyan-200 transition">
+    <FaFolderOpen className="text-lg" />
+    ดูรายละเอียด
+  </button>
+  <button className="flex items-center gap-2 bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200 transition">
+    <FaTimesCircle className="text-lg" />
+    ยกเลิก
+  </button>
+</div>
+    </div>
+  </div>
+))}
         </div>
     );
 }

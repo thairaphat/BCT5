@@ -2,6 +2,7 @@ import React from "react";
 import SearchBox from "../components/SearchBox";
 import { useState } from "react";
 import { useMemo } from "react";
+import { HiSpeakerphone } from "react-icons/hi"; // 👈 ไอคอนลำโพง
 
 const activityHistory = [
   {
@@ -409,17 +410,16 @@ const activityHistory = [
 export default function ActivityHistory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(16);
+  const [itemsPerPage] = useState(16);
 
   const filteredItems = useMemo(() => {
     return activityHistory.filter(item =>
       item.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [activityHistory, searchTerm]);
+  }, [searchTerm]);
 
   const totalItems = filteredItems.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-
   const startIdx = (currentPage - 1) * itemsPerPage;
   const endIdx = startIdx + itemsPerPage;
 
@@ -431,13 +431,13 @@ export default function ActivityHistory() {
     <div className="max-w-6xl mx-auto p-6 pt-0">
       <SearchBox value={searchTerm} onChange={setSearchTerm} />
       <h1 className="text-2xl font-bold flex items-center gap-2 mb-6 mt-5">
-        <span>📢</span> ประวัติการเข้าร่วมกิจกรรม
-      </h1>
+  <HiSpeakerphone className="text-yellow-500 text-3xl" />
+  ประวัติการเข้าร่วมกิจกรรม
+</h1>
 
-      {/* Table */}
       <div className="overflow-auto">
         <table className="w-full border text-sm text-left">
-          <thead className="bg-gray-100 border-b">
+          <thead className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
             <tr>
               <th className="p-2 border">#</th>
               <th className="p-2 border">ปีการศึกษา</th>
@@ -461,17 +461,14 @@ export default function ActivityHistory() {
                 <td className="p-2 border text-right">{item.hours.toFixed(2)}</td>
                 <td className="p-2 border text-right">{item.points}</td>
                 <td className="p-2 border">{item.type}</td>
-                <td className="p-2 border text-center">
-                  {item.passed ? "✅" : "❌"}
-                </td>
+                <td className="p-2 border text-center">{item.passed ? "✅" : "❌"}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
+      <div className="flex justify-between items-center mt-4 text-sm text-gray-600 dark:text-white">
   <span>
     แสดง {startIdx + 1} - {Math.min(endIdx, totalItems)} จาก {totalItems} รายการ
   </span>
@@ -481,7 +478,9 @@ export default function ActivityHistory() {
     <button
       onClick={() => setCurrentPage(1)}
       disabled={currentPage === 1}
-      className="px-2 py-1 border rounded disabled:opacity-50"
+      className="px-2 py-1 border rounded disabled:opacity-50 
+                 text-gray-800 dark:text-white 
+                 border-gray-400 dark:border-white"
     >
       &laquo;
     </button>
@@ -490,7 +489,9 @@ export default function ActivityHistory() {
     <button
       onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
       disabled={currentPage === 1}
-      className="px-2 py-1 border rounded disabled:opacity-50"
+      className="px-2 py-1 border rounded disabled:opacity-50 
+                 text-gray-800 dark:text-white 
+                 border-gray-400 dark:border-white"
     >
       &lsaquo;
     </button>
@@ -504,9 +505,12 @@ export default function ActivityHistory() {
         max={totalPages}
         value={currentPage}
         onChange={(e) =>
-          setCurrentPage(Math.min(Math.max(Number(e.target.value), 1), totalPages))    
+          setCurrentPage(Math.min(Math.max(Number(e.target.value), 1), totalPages))
         }
-        className="w-14 px-2 py-1 border rounded text-center"
+        className="w-14 px-2 py-1 border rounded text-center 
+                   text-black dark:text-black 
+                   bg-white dark:bg-white 
+                   border-gray-400 dark:border-white"
       />
       / {totalPages}
     </span>
@@ -515,7 +519,9 @@ export default function ActivityHistory() {
     <button
       onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
       disabled={currentPage === totalPages}
-      className="px-2 py-1 border rounded disabled:opacity-50"
+      className="px-2 py-1 border rounded disabled:opacity-50 
+                 text-gray-800 dark:text-white 
+                 border-gray-400 dark:border-white"
     >
       &rsaquo;
     </button>
@@ -524,26 +530,14 @@ export default function ActivityHistory() {
     <button
       onClick={() => setCurrentPage(totalPages)}
       disabled={currentPage === totalPages}
-      className="px-2 py-1 border rounded disabled:opacity-50"
+      className="px-2 py-1 border rounded disabled:opacity-50 
+                 text-gray-800 dark:text-white 
+                 border-gray-400 dark:border-white"
     >
       &raquo;
     </button>
-
-    {/* dropdown จำนวนรายการ/หน้า */}
-    {/* <select
-      value={itemsPerPage}
-      onChange={(e) => {
-        setItemsPerPage(Number(e.target.value));
-        setCurrentPage(1); // รีเซ็ตไปหน้า 1
-      }}
-      className="ml-2 border rounded px-2 py-1"
-    >
-      <option value={16}>16</option>
-      <option value={16}>20</option>
-    </select> */}
   </div>
 </div>
-
     </div>
   );
 }
