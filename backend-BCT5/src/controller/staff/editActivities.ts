@@ -1,13 +1,13 @@
 import pool from '../../connect/db';
 import { Elysia } from 'elysia';
 export const editActivity = async (
-  activity_id: number,
+  activity_id: Number,
   name: string,
   description: string,
   location: string,
   start_date: string,
   end_date: string,
-  activity_type: string,
+  activity_type: number,
   reg_deadline: string,
   max_participants: number,
   volunteer_hours: number,
