@@ -34,6 +34,7 @@ export const staffRoute = new Elysia()
 
   // สร้างกิจกรรมใหม่
   .post('/activities', async ({ body, user }) => {
+    console.log(body)
     if (!user || user.role !== 'staff') {
       return {
         success: false,
@@ -74,7 +75,7 @@ export const staffRoute = new Elysia()
       location: t.String(),
       start_date: t.String(),
       end_date: t.String(),
-      activity_type: t.String(),
+      activity_type: t.Number(),
       reg_deadline: t.String(),
       max_participants: t.Number(),
       volunteer_hours: t.Number(),
@@ -129,7 +130,7 @@ export const staffRoute = new Elysia()
       location: t.String(),
       start_date: t.String(),
       end_date: t.String(),
-      activity_type: t.String(),
+      activity_type: t.Number(),
       reg_deadline: t.String(),
       max_participants: t.Number(),
       volunteer_hours: t.Number(),
