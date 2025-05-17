@@ -12,6 +12,8 @@ import ActivityAll from "./pages/ActivityAll";
 import DashboardStaff from "./pages/DashboardStaff";
 import CreateActivity from "./pages/CreateActivity";
 import ManagePetition from "./pages/ManagePetition";
+import ManagePetitionCreateActivityAdmin from "./pages/ManagePetitionCreateActivityAdmin";
+ 
 
 export default function App() {
   return (
@@ -37,6 +39,7 @@ export default function App() {
         <Route path="/dashboardStaff" element={<DashboardStaff />} />
         <Route path="/createActivity" element={<CreateActivity />} />
         <Route path="/managePetition" element={<ManagePetition/>} />
+        <Route path="/ManagePetitionCreateActivityAdmin" element={<ManagePetitionCreateActivityAdmin/>} />
       </Route>
 
       <Route path="*" element={<div>ไม่พบหน้านี้</div>} />
