@@ -17,13 +17,14 @@ async function startApp() {
     }
 
   const app = new Elysia()
-  .use(adminRoute)
-  .use(loginRoute)
-  .use(registerRoute)
-  .use(studentRoute) 
-  .use(activityRoutes)
+  
   .group('/api', app => {
     return app
+      .use(adminRoute)
+      .use(loginRoute)
+      .use(registerRoute)
+      .use(studentRoute) 
+      .use(activityRoutes)
       .use(staffRoute) 
       .use(authMiddleware)
       .get('/profile', ({ user }: CustomContext) => {
