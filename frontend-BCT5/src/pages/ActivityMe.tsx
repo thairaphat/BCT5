@@ -2,6 +2,8 @@ import React from "react";
 import SearchBox from "../components/SearchBox";
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { FaFolderOpen, FaTimesCircle, FaRegCalendarAlt } from "react-icons/fa"; 
+
 
 const tabs = [
   "อยู่ระหว่างกิจกรรม",
@@ -111,16 +113,20 @@ export default function MyActivities() {
                       กิจกรรมประเภท: <span className="text-yellow-600">{type}</span>
                     </h1>
                     <select
-                      className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      value={type}
-                      onChange={handleChange}
-                    >
-                      {activityTypes.map((t) => (
-                        <option key={t} value={t}>
-                          {t}
-                        </option>
-                      ))}
-                    </select>
+  className="border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 bg-white dark:bg-[#2c2c2c] text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+  value={type}
+  onChange={handleChange}
+>
+  {activityTypes.map((t) => (
+    <option
+      key={t}
+      value={t}
+      className="text-black dark:text-white bg-white dark:bg-[#2c2c2c]"
+    >
+      {t}
+    </option>
+  ))}
+</select>
                 </div>
             </div>
 
@@ -149,53 +155,58 @@ export default function MyActivities() {
 
             {/* Activity Cards */}
             {filteredActivities.map((activity, idx) => (
-                <div
-                key={idx}
-                className="flex flex-col md:flex-row bg-white border rounded-lg shadow-md mb-6 overflow-hidden transition-shadow hover:shadow-lg"
-                >
-                    {/* Thumbnail */}
-                    <div className="md:w-1/4 w-full h-48 md:h-auto">
-                      {activity.image ? (
-                        <img
-                          src={activity.image}
-                          alt={activity.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-500 text-sm">
-                          ไม่มีภาพ
-                        </div>
-                      )}
-                    </div>
+  <div
+    key={idx}
+    className="flex flex-col md:flex-row bg-white dark:bg-[#1f1f1f] text-black dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg shadow-md mb-6 overflow-hidden transition-shadow hover:shadow-lg"
+  >
+    {/* Thumbnail */}
+    <div className="md:w-1/4 w-full h-48 md:h-auto">
+      {activity.image ? (
+        <img
+          src={activity.image}
+          alt={activity.title}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div className="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 text-sm">
+          ไม่มีภาพ
+        </div>
+      )}
+    </div>
 
-                    {/* Details */}
-                    <div className="md:w-3/4 p-4 flex flex-col justify-between">
-                        <div>
-                            <h2 className="text-lg font-semibold mb-1">{activity.title}</h2>
-                            <p className="text-sm text-gray-500 flex items-center gap-1">
-                              📅 {activity.dateRange}
-                            </p>
-                            <p className="text-sm mt-2">
-                              <span className="font-semibold">สถานะ:</span>{" "}
-                              <span className={getStatusColorClass(activity.status)}>{activity.status}</span>
-                            </p>
-                            <p className="text-sm mt-2 text-gray-500">
-                              ประเภทกิจกรรม: <span className="text-gray-700">{activity.type}</span>
-                            </p>
-                        </div>
+    {/* Details */}
+    <div className="md:w-3/4 p-4 flex flex-col justify-between">
+      <div>
+        <h2 className="text-lg font-semibold mb-1">{activity.title}</h2>
+        <p className="text-sm text-gray-500 flex items-center gap-2">
+          <FaRegCalendarAlt className="text-base text-red-500" />
+          {activity.dateRange}
+        </p>
+        <p className="text-sm mt-2">
+          <span className="font-semibold">สถานะ:</span>{" "}
+          <span className={getStatusColorClass(activity.status)}>
+            {activity.status}
+          </span>
+        </p>
+        <p className="text-sm mt-2 text-gray-500 dark:text-gray-400">
+          ประเภทกิจกรรม: <span className="text-gray-700 dark:text-gray-200">{activity.type}</span>
+        </p>
+      </div>
 
-                        {/* Buttons */}
-                        <div className="mt-4 flex flex-wrap gap-2">
-                            <button className="flex items-center gap-1 bg-cyan-100 text-cyan-700 px-3 py-1 rounded hover:bg-cyan-200 transition">
-                              📁 ดูรายละเอียด
-                            </button>
-                            <button className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200 transition">
-                              ⛔ ยกเลิก
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            ))}
+      {/* Buttons */}
+      <div className="mt-4 flex flex-wrap gap-2">
+  <button className="flex items-center gap-2 bg-cyan-100 text-cyan-700 px-3 py-1 rounded hover:bg-cyan-200 transition">
+    <FaFolderOpen className="text-lg" />
+    ดูรายละเอียด
+  </button>
+  <button className="flex items-center gap-2 bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200 transition">
+    <FaTimesCircle className="text-lg" />
+    ยกเลิก
+  </button>
+</div>
+    </div>
+  </div>
+))}
         </div>
     );
 }

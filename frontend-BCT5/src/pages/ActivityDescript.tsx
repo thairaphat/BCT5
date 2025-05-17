@@ -1,4 +1,5 @@
 import React from "react";
+import { FaStar, FaCalendarAlt, FaClock, FaStopwatch, FaClipboardList } from 'react-icons/fa';
 
 export default function ActivityDetail() {
   return (
@@ -9,52 +10,55 @@ export default function ActivityDetail() {
 
             <div className="w-full aspect-video bg-gray-300 border border-gray-400 mb-6" />
 
-            <h2 className="text-lg font-semibold mb-4">กิจกรรมประเภท: ทั้งหมด</h2>
+            <h1 className="text-2xl font-bold">
+  <span className="text-yellow-500">กิจกรรมประเภท:</span> ทั้งหมด
+</h1>
             <h2 className="text-lg font-semibold mb-1">เกี่ยวกับกิจกรรม</h2>
-            <p className="text-sm text-gray-700 leading-relaxed">
-                It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout...
-            </p>
+            <p className="text-gray-800 dark:text-white">
+  It is a long established fact that a reader will be distracted by the readable content...
+</p>
         </div>
 
       {/* Right side: status + button */}
     <div className="border border-gray-300 rounded p-4 flex flex-col justify-between h-fit mt-12">
 
         {/* Box: สถานะ */}
-        <div className="space-y-2 text-sm">
-          <div className="flex items-start gap-2">
-            <span>⭐</span> 
-            <span>
-              <span className="font-semibold">สถานะกิจกรรม</span>:{" "}
-              <span className="text-green-600 font-semibold">เปิดการลงทะเบียน</span>
-            </span>
-          </div>
+        <div className="space-y-3 text-sm text-black dark:text-white">
+  <div className="flex items-center gap-2">
+    <FaStar className="text-yellow-400" />
+    <span>
+      <span className="font-semibold">ระดับกิจกรรม:</span> สูง
+    </span>
+  </div>
 
-          <div className="flex items-start gap-2">
-            📅
-            <div>
-              <span className="font-semibold">ระยะเวลาลงทะเบียน</span>: <br />
-              14 พ.ค. 2568 - 13 มิ.ย. 2568
-            </div>
-          </div>
+  <div className="flex items-start gap-2">
+    <FaCalendarAlt className="mt-1" />
+    <div>
+      <span className="font-semibold">ระยะเวลาลงทะเบียน:</span>
+      <br />
+      14 พ.ค. 2568 - 13 มิ.ย. 2568
+    </div>
+  </div>
 
-          <div className="flex items-start gap-2">
-            🕓
-            <div>
-              <span className="font-semibold">ระยะเวลากิจกรรม</span>: <br />
-              14 พ.ค. 2568 - 13 มิ.ย. 2568
-            </div>
-          </div>
+  <div className="flex items-start gap-2">
+    <FaClock className="mt-1" />
+    <div>
+      <span className="font-semibold">ระยะเวลากิจกรรม:</span>
+      <br />
+      14 พ.ค. 2568 - 13 มิ.ย. 2568
+    </div>
+  </div>
 
-          <div className="flex items-start gap-2">
-            ⏱️
-            <span className="font-semibold">ชั่วโมงอาสา</span>: 13 ชั่วโมง
-          </div>
+  <div className="flex items-center gap-2">
+    <FaStopwatch />
+    <span className="font-semibold">ชั่วโมงอาสา :</span> 13 ชั่วโมง
+  </div>
 
-          <div className="flex items-start gap-2">
-            📋
-            <span className="font-semibold">คะแนนจิตอาสา</span>: -
-          </div>
-        </div>
+  <div className="flex items-center gap-2">
+    <FaClipboardList />
+    <span className="font-semibold">คะแนนจิตอาสา :</span> -
+  </div>
+</div>
 
         {/* Box: ลำดับความสำเร็จ */}
         <div>

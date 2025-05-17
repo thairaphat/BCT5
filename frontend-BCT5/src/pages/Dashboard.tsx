@@ -1,4 +1,4 @@
-// Dashboard.tsx (Dark Theme Ready)
+// Dashboard.tsx (Final fix: Full-width SearchBox outside grid)
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../store/hooks";
 import { logout } from "../store/auth/authSlice";
@@ -18,11 +18,13 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white text-black dark:bg-[#181818] dark:text-white transition-colors duration-300">
+      {/* ✅ SearchBox อยู่นอก grid เต็มจอ */}
       <div className="mb-9 px-9">
-        <SearchBox value={searchTerm} onChange={setSearchTerm} />
-      </div>
-      <div className="p-4 grid grid-cols-1 lg:grid-cols-4 gap-4">
-        {/* ฝั่งซ้าย - หมวดกิจกรรม */}
+  <SearchBox value={searchTerm} onChange={setSearchTerm} />
+</div>
+
+      <div className="px-4 lg:px-8 grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {/* ซ้าย 3 ช่อง - หมวดกิจกรรม */}
         <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
           {[{ title: "อาสา", image: "/img/Card1.webp" }, { title: "ช่วยงาน", image: "/img/Card2.webp" }, { title: "อบรม", image: "/img/Card3.webp" }].map((item) => (
             <div
@@ -44,7 +46,7 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* ฝั่งขวา */}
+        {/* ขวา 1 ช่อง - รายละเอียดกิจกรรม */}
         <div className="space-y-6">
           {/* กิจกรรมล่าสุด */}
           <Card className="p-4 bg-white dark:bg-[#252525] border border-gray-200 dark:border-[#2e2e2e] text-black dark:text-white">
