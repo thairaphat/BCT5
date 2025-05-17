@@ -4,8 +4,8 @@ import { editActivity } from '../controller/staff/editActivities';
 import { closeActivity } from '../controller/staff/closeActivities';
 import { cancelActivity } from '../controller/staff/cancelActivities';
 import { getAllActivities, getActivityById } from '../controller/staff/getActivities';
+import { deleteActivity } from "../controller/staff/deleteActivities";
 import { User } from '../type/type';
-import { authMiddleware } from '../middleware/authMiddleware';
 import {staffAuthMiddleware} from '../middleware/staffAuthMiddleware'
 type Context = {
   user: User;
@@ -173,5 +173,20 @@ export const staffRoute = new Elysia()
     body: t.Object({
       reason: t.String()
     })
-  });
+  })
+  
+  .delete('/activities/:id', async ({ params, user }) => {
+    if (!user || user.role !== 'staff') {
+      return {
+        success: false,
+        message: 'ไม่มีสิทธิ์ในการลบกิจกรรม'
+      };
+    }
 
+    const activity_id = parseInt(params.id);
+    return await deleteActivity(activity_id, user.id);
+    }, {
+      params: t.Object({
+      id: t.String()
+    })
+  });
