@@ -2,7 +2,7 @@ import pool from '../../connect/db';
 
 export const cancelActivity = async (activity_id: number, cancelled_by: number, reason: string) => {
   try {
-    // ตรวจสอบว่ากิจกรรมมีอยู่จริงและไม่ถูกยกเลิกไปแล้ว
+    // แก้ไข query ให้ใช้ status_check_id และ join กับ status_check table
     const activityCheckResult = await pool.query(
       `SELECT a.id, s.status_name
        FROM activities a 
@@ -18,6 +18,7 @@ export const cancelActivity = async (activity_id: number, cancelled_by: number, 
       };
     }
 
+    // ตรวจสอบโดยใช้ status_name จาก status_check table
     if (activityCheckResult.rows[0].status_name === 'cancelled') {
       return {
         success: false,
@@ -52,7 +53,7 @@ export const cancelActivity = async (activity_id: number, cancelled_by: number, 
     try {
       await client.query('BEGIN');
 
-      // อัปเดตสถานะกิจกรรมเป็น 'cancelled' (ใช้ status_check_id แทน status)
+      // อัปเดตฟิลด์ status_check_id แทน status
       await client.query(
         `UPDATE activities 
          SET status_check_id = $1, updated_at = CURRENT_TIMESTAMP
