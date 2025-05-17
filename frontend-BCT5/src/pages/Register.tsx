@@ -1,4 +1,3 @@
-// src/pages/Register.tsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -13,23 +12,67 @@ import {
 } from "react-icons/fi";
 
 export default function Register() {
-  const [name, setName] = useState("");
-  const [lastName, setlastName] = useState("");
-  const [studentId, setstudentId] = useState("");
+  const [first_name, setfirst_name] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [student_id, setStudent_id] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [faculty, setFaculty] = useState("");
-  const [major, setMajor] = useState("");
-
+  const [faculty_id, setFaculty_id] = useState("");
+  const [department_id, setDepartment_id] = useState("");
+  const [faculties, setFaculties] = useState<{ faculty_id: number; faculty_name: string }[]>([]);
+ const [departments, setDepartments] = useState<{ department_id: number; department_name: string }[]>([]);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
+  type Faculty = {
+    faculty_id: number;
+    faculty_code?: string;  // ถ้ามี
+    faculty_name: string;
+  };
   const { status, error } = useAppSelector((state) => state.auth);
+  useEffect(() => {
+    fetch("http://localhost:3000/api/faculties")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("API data:", data);
+        if (data.success && Array.isArray(data.faculties)) {
+          setFaculties(data.faculties); // <-- This is correct
+        } else {
+          console.error("คณะไม่ใช่ array", data);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
+  useEffect(() => {
+    if (!faculty_id) {
+      setDepartments([]);
+      return;
+    }
+    setIsLoaded(false);
+    fetch(`http://localhost:3000/api/departments/${faculty_id}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        console.log("API data (departments):", data); // ดูข้อมูลที่ได้
+        if (data.success && Array.isArray(data.departments)) {
+          setDepartments(data.departments);
+        } else {
+          console.error("Response ไม่ถูกต้อง", data);
+          setDepartments([]);
+        }
+      })
+      .catch(err => {
+        console.error("Error fetching departments:", err);
+        setDepartments([]);
+      })
+      .finally(() => setIsLoaded(true));
+  }, [faculty_id]);
   useEffect(() => {
     setIsLoaded(true);
   }, []);
@@ -98,31 +141,48 @@ export default function Register() {
     setValidationError(null);
 
     try {
-      const resultAction = await dispatch(
-        register({ name, lastName, email, password, studentId, faculty, major })
-      ).unwrap();
-      if (resultAction) {
+      const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_id: student_id,
+          password: password,
+          first_name: first_name,
+          last_name: lastname,
+          email: email,
+          faculty_id: parseInt(faculty_id) || 0,
+          department_id: parseInt(department_id) || 0
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
         navigate("/");
+      } else {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
-    } catch (err) {
-      console.error("Registration failed:", err);
+    } catch (err: any) {
+      console.error("การสมัครสมาชิกผิดพลาด:", err);
+      if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
+        setValidationError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตหรือลองใหม่อีกครั้ง");
+      } else {
+        setValidationError(err.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
+      }
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-login bg-cover">
       <div
-        className={`w-full max-w-md transition-all duration-700 ease-out ${
-          isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        }`}
+        className={`w-full max-w-md transition-all duration-700 ease-out ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
       >
-        
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-6">
-            <p className=" text-black mt-1 flex">
-              Welcome to <p className="text-primary">&nbsp;VolunteerHub</p>
+            <p className="text-black mt-1 flex">
+              ยินดีต้อนรับสู่ <p className="text-primary"> VolunteerHub</p>
             </p>
-            <h2 className="text-5xl font-bold text-black">Sign in</h2>
+            <h2 className="text-5xl font-bold text-black">สมัครสมาชิก</h2>
           </div>
 
           <div className="p-8 pt-0">
@@ -141,7 +201,7 @@ export default function Register() {
                   className="block text-gray-700 font-medium mb-2 flex items-center"
                 >
                   <FiMail className="mr-2 text-primary" />
-                  Enter your email address
+                  กรอกที่อยู่อีเมลของคุณ
                 </label>
                 <input
                   id="email"
@@ -157,38 +217,38 @@ export default function Register() {
               <div className="flex">
                 <div>
                   <label
-                    htmlFor="name"
+                    htmlFor="first_name"
                     className="block text-gray-700 font-medium mb-2 flex items-center"
                   >
                     <FiUser className="mr-2 text-primary" />
-                    First name
+                    ชื่อ
                   </label>
                   <input
-                    id="name"
+                    id="first_name"
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={first_name}
+                    onChange={(e) => setfirst_name(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none"
-                    placeholder="First name"
+                    placeholder="ชื่อ"
                     required
                   />
                 </div>
 
                 <div>
                   <label
-                    htmlFor="lastName"
+                    htmlFor="lastname"
                     className="block text-gray-700 font-medium mb-2 flex items-center"
                   >
                     <FiUser className="mr-2 text-primary" />
-                    Last name
+                    นามสกุล
                   </label>
                   <input
-                    id="lastName"
+                    id="lastname"
                     type="text"
-                    value={lastName}
-                    onChange={(e) => setlastName(e.target.value)}
+                    value={lastname}
+                    onChange={(e) => setLastname(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none ml-2"
-                    placeholder="Last name"
+                    placeholder="นามสกุล"
                     required
                   />
                 </div>
@@ -196,19 +256,19 @@ export default function Register() {
 
               <div>
                 <label
-                  htmlFor="studentId"
+                  htmlFor="student_id"
                   className="block text-gray-700 font-medium mb-2 flex items-center"
                 >
                   <FiCreditCard className="mr-2 text-primary" />
-                  Student ID
+                  รหัสนักศึกษา
                 </label>
                 <input
-                  id="studentId"
+                  id="student_id"
                   type="text"
-                  value={studentId}
-                  onChange={(e) => setstudentId(e.target.value)}
+                  value={student_id}
+                  onChange={(e) => setStudent_id(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none"
-                  placeholder="Student ID"
+                  placeholder="รหัสนักศึกษา"
                   required
                 />
               </div>
@@ -216,48 +276,53 @@ export default function Register() {
               <div className="flex">
                 <div>
                   <label
-                    htmlFor="faculty"
+                    htmlFor="faculty_id"
                     className="block text-gray-700 font-medium mb-2 flex items-center"
                   >
                     <FiUser className="mr-2 text-primary" />
-                    Faculty
+                    คณะ
                   </label>
                   <select
-                    id="faculty"
-                    value={faculty}
-                    onChange={(e) => setFaculty(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none"
+                    id="faculty_id"
+                    value={faculty_id}
+                    onChange={(e) => setFaculty_id(e.target.value)}
                     required
                   >
                     <option value="">-- กรุณาเลือกคณะ --</option>
-                    <option value="วิศวกรรมศาสตร์">วิศวกรรมศาสตร์</option>
-                    <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
-                    <option value="บริหารธุรกิจ">บริหารธุรกิจ</option>
-                    {/* เพิ่มอื่น ๆ ได้ตามต้องการ */}
+                    {faculties.map((faculty) => (
+                      <option key={faculty.faculty_id} value={faculty.faculty_id}>
+                        {faculty.faculty_name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
                   <label
-                    htmlFor="major"
+                    htmlFor="department_id"
                     className="block text-gray-700 font-medium mb-2 flex items-center"
                   >
                     <FiUser className="mr-2 text-primary" />
-                    Major
+                    สาขา
                   </label>
-                  <select
-                    id="major"
-                    value={major}
-                    onChange={(e) => setMajor(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none ml-2"
-                    required
-                  >
-                    <option value="">-- กรุณาเลือกสาขา --</option>
-                    <option value="คอมพิวเตอร์">คอมพิวเตอร์</option>
-                    <option value="โยธา">โยธา</option>
-                    <option value="ไฟฟ้า">ไฟฟ้า</option>
-                    {/* เพิ่มได้ตามสาขา */}
-                  </select>
+             <select
+  id="department_id"
+  value={department_id}
+  onChange={(e) => setDepartment_id(e.target.value)}
+  required
+>
+  <option value="">
+    {departments && departments.length > 0
+      ? '-- กรุณาเลือกสาขา --'
+      : 'ไม่มีข้อมูลสาขา'}
+  </option>
+
+  {departments && departments.length > 0 && departments.map((dept) => (
+    <option key={dept.department_id} value={dept.department_id}>
+      {dept.department_name}
+    </option>
+  ))}
+</select>
                 </div>
               </div>
 
@@ -267,7 +332,7 @@ export default function Register() {
                   className="block text-gray-700 font-medium mb-2 flex items-center"
                 >
                   <FiKey className="mr-2 text-primary" />
-                  Enter your Password
+                  กรอกรหัสผ่านของคุณ
                 </label>
                 <input
                   id="password"
@@ -287,15 +352,14 @@ export default function Register() {
                         ความแข็งแรงของรหัสผ่าน:
                       </div>
                       <div
-                        className={`text-xs ${
-                          passwordStrength <= 1
-                            ? "text-red-500"
-                            : passwordStrength === 2
+                        className={`text-xs ${passwordStrength <= 1
+                          ? "text-red-500"
+                          : passwordStrength === 2
                             ? "text-orange-500"
                             : passwordStrength === 3
-                            ? "text-yellow-600"
-                            : "text-green-600"
-                        }`}
+                              ? "text-yellow-600"
+                              : "text-green-600"
+                          }`}
                       >
                         {getStrengthText()}
                       </div>
@@ -321,18 +385,17 @@ export default function Register() {
                   className="block text-gray-700 font-medium mb-2 flex items-center"
                 >
                   <FiShield className="mr-2 text-primary" />
-                  Confirm your Password
+                  ยืนยันรหัสผ่านของคุณ
                 </label>
                 <input
                   id="confirmPassword"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`w-full px-4 py-3 rounded-lg border focus:ring focus:ring-opacity-20 transition-all duration-200 outline-none ${
-                    confirmPassword && password !== confirmPassword
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-primary focus:ring-primary"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-lg border focus:ring focus:ring-opacity-20 transition-all duration-200 outline-none ${confirmPassword && password !== confirmPassword
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:border-primary focus:ring-primary"
+                    }`}
                   placeholder="••••••••"
                   required
                 />
@@ -372,7 +435,7 @@ export default function Register() {
                       <span>กำลังสมัครสมาชิก...</span>
                     </>
                   ) : (
-                    <span>Sign Up</span>
+                    <span>สมัครสมาชิก</span>
                   )}
                 </button>
               </div>
@@ -380,12 +443,12 @@ export default function Register() {
 
             <div className="mt-8 text-center">
               <p className="text-gray-600">
-                Have an Account ?{" "}
+                มีบัญชีอยู่แล้ว ?{" "}
                 <Link
                   to="/login"
                   className="text-primary font-medium hover:text-primary-dark transition-colors duration-200"
                 >
-                  Sign in
+                  เข้าสู่ระบบ
                 </Link>
               </p>
             </div>

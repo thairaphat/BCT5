@@ -10,13 +10,11 @@ import {staffAuthMiddleware} from '../middleware/staffAuthMiddleware'
 type Context = {
   user: User;
 };
+
 export const staffRoute = new Elysia()
  .use(staffAuthMiddleware)
- 
-  
 
-  // ดึงข้อมูลกิจกรรมทั้งหมด
-  
+  // ดึงข้อมูลกิจกรรมทั้งหมด  
   .get('/activities', async ({ query }) => {
     const status = query.status ? query.status.split(',') : ['pending','approved','rejected','open', 'closed', 'cancelled'];
     return await getAllActivities(status);
@@ -139,20 +137,25 @@ export const staffRoute = new Elysia()
   })
 
   // ปิดกิจกรรม
-   .patch('/activities/:id/close', async ({ params, user }) => {
-    if (!user || user.role !== 'staff') {
-      return {
-        success: false,
-        message: 'ไม่มีสิทธิ์ในการปิดกิจกรรม'
-      };
-    }
+  .patch('/activities/:id/close', async ({ params, body, user }) => {
+  if (!user || user.role !== 'staff') {
+    return {
+      success: false,
+      message: 'ไม่มีสิทธิ์ในการปิดกิจกรรม'
+    };
+  }
 
-    const activity_id = parseInt(params.id);
-    return await closeActivity(activity_id, user.id);
-  }, {
-    params: t.Object({
-      id: t.String()
-    })
+  const activity_id = parseInt(params.id);
+  const { staff_note } = body as { staff_note?: string };
+  
+  return await closeActivity(activity_id, user.id, staff_note || '');
+    }, {
+      params: t.Object({
+        id: t.String()
+      }),
+      body: t.Object({
+        staff_note: t.Optional(t.String())
+      })
   })
   // ยกเลิกกิจกรรม
  .patch('/activities/:id/cancel', async ({ params, body, user }) => {
@@ -165,6 +168,13 @@ export const staffRoute = new Elysia()
 
     const activity_id = parseInt(params.id);
     const { reason } = body;
+
+    if (!reason || reason.trim() === '') {
+      return {
+        success: false,
+        message: 'กรุณาระบุเหตุผลในการยกเลิกกิจกรรม'
+      };
+    }
 
     return await cancelActivity(activity_id, user.id, reason);
   }, {

@@ -1,3 +1,4 @@
+// Dashboard.tsx (Final fix: Full-width SearchBox outside grid)
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../store/hooks";
 import { logout } from "../store/auth/authSlice";
@@ -34,21 +35,20 @@ export default function Dashboard() {
     navigate("/login");
   };
 
-useEffect(() => {
-  async function fetchData() {
-    try {
-      const latestActivity = await fetchLatestActivity();
-      setLatestActivity(latestActivity);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const latestActivity = await fetchLatestActivity();
+        setLatestActivity(latestActivity);
 
-      const latestNotification = await fetchLatestNotification();
-      setLatestNotification(latestNotification);
-    } catch (error) {
-      console.error(error);
+        const latestNotification = await fetchLatestNotification();
+        setLatestNotification(latestNotification);
+      } catch (error) {
+        console.error(error);
+      }
     }
-  }
-  fetchData();
-}, []);
-
+    fetchData();
+  }, []);
 
   useEffect(() => {
     async function fetchLatestActivity() {
@@ -79,7 +79,7 @@ useEffect(() => {
   }, []);
 
   return (
-    <div>
+     <div>
       <div className="mb-9 flex justify-end px-9">
         <SearchBox value={searchTerm} onChange={setSearchTerm} />
       </div>

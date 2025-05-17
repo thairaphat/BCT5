@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: btc5
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: btc5
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: git@github.com:thairaphat/BCT5.git
+    targetRevision: main
+    path: kube-manifest/app
+    directory:
+      recurse: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

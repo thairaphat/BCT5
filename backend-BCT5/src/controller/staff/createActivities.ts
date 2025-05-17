@@ -1,5 +1,6 @@
 import pool from '../../connect/db';
 import { Elysia } from 'elysia';
+
 export const createActivity = async (
   name: string,
   description: string,
@@ -33,6 +34,21 @@ export const createActivity = async (
       };
     }
 
+    // ดึง status_check_id สำหรับสถานะ 'pending'
+    const statusResult = await pool.query(
+      'SELECT id FROM status_check WHERE status_name = $1',
+      ['pending']
+    );
+
+    if (statusResult.rows.length === 0) {
+      return {
+        success: false,
+        message: 'ไม่พบสถานะ "pending" ในระบบ'
+      };
+    }
+
+    const pendingStatusId = statusResult.rows[0].id;
+
     // เริ่ม transaction
     const client = await pool.connect();
     
@@ -41,10 +57,10 @@ export const createActivity = async (
 
       // 1. สร้างข้อมูลกิจกรรมใน activities
       const activityResult = await client.query(
-        `INSERT INTO activities(name, activity_type, reg_deadline, created_by, status, max_participants, created_at, updated_at)
-         VALUES($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         RETURNING id, name, activity_type, reg_deadline, status, max_participants`,
-        [name, activity_type, reg_deadline, created_by, 'pending', max_participants]
+        `INSERT INTO activities(name, activity_type, reg_deadline, created_by, status_check_id, max_participants, created_at, updated_at, is_deleted)
+         VALUES($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, FALSE)
+         RETURNING id, name, activity_type, reg_deadline, max_participants`,
+        [name, activity_type, reg_deadline, created_by, pendingStatusId, max_participants]
       );
 
       const activityId = activityResult.rows[0].id;
@@ -58,6 +74,14 @@ export const createActivity = async (
 
       await client.query('COMMIT');
 
+      // ดึงข้อมูลสถานะเพื่อส่งกลับ
+      const statusNameResult = await pool.query(
+        'SELECT status_name FROM status_check WHERE id = $1',
+        [pendingStatusId]
+      );
+      
+      const status = statusNameResult.rows[0]?.status_name || 'pending';
+
       return {
         success: true,
         message: 'สร้างกิจกรรมสำเร็จ',
@@ -70,7 +94,7 @@ export const createActivity = async (
           start_date,
           end_date,
           reg_deadline,
-          status: 'pending',
+          status,
           max_participants,
           volunteer_hours,
           volunteer_points,
