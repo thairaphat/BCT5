@@ -11,9 +11,11 @@ import Profile from "./pages/Profile";
 import ActivityAll from "./pages/ActivityAll";
 import DashboardStaff from "./pages/DashboardStaff";
 import CreateActivity from "./pages/CreateActivity";
-import ManagePetition from "./pages/ManagePetition";
-import ManagePetitionCreateActivityAdmin from "./pages/ManagePetitionCreateActivityAdmin";
- 
+import ManageOverview from "./pages/ManageOverview";
+import DashboardAdmin from "./pages/DashboardAdmin";
+import ManagePetitionActivity from "./pages/ManagePetitionActivity";
+import ManageRoleAdmin from "./pages/ManageRoleAdmin";
+import OverallActivityAdmin from "./pages/OverallActivityAdmin";  
 
 export default function App() {
   return (
@@ -38,11 +40,15 @@ export default function App() {
 
         <Route path="/dashboardStaff" element={<DashboardStaff />} />
         <Route path="/createActivity" element={<CreateActivity />} />
-        <Route path="/managePetition" element={<ManagePetition/>} />
-        <Route path="/ManagePetitionCreateActivityAdmin" element={<ManagePetitionCreateActivityAdmin/>} />
+        <Route path="/ManageOverview" element={<ManageOverview/>} />
+        <Route path="/DashboardAdmin" element={<DashboardAdmin/>} />
+        <Route path="/ManagePetitionActivity" element={<ManagePetitionActivity/>} />
+        <Route path="/ManageRoleAdmin" element={<ManageRoleAdmin/>} />
+        <Route path="/OverallActivityAdmin" element={<OverallActivityAdmin/>} />
       </Route>
 
       <Route path="*" element={<div>ไม่พบหน้านี้</div>} />
     </Routes>
   );
 }
+

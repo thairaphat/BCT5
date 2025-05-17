@@ -45,7 +45,7 @@ const activities = [
   },
 ];
 
-export default function ManagePetition() {
+export default function ManageOverview() {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
