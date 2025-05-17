@@ -7,6 +7,7 @@ import type { CustomContext } from './type/context';
 import { adminRoute } from './route/adminRoute';
 import { studentRoute } from './route/studentRoute';
 import { staffRoute } from './route/staffRoute';
+import { notificationRoutes } from './route/notificationRoutes';
 import { routes as activityRoutes } from './route/activityRoutes';
 async function startApp() {
   try {
@@ -26,6 +27,7 @@ async function startApp() {
       .use(staffRoute) 
       .use(studentRoute) 
       .use(activityRoutes)
+      .use(notificationRoutes)
       .use(authMiddleware)
       .get('/profile', ({ user }: CustomContext) => {
         return `hello, user ${user.id}`;

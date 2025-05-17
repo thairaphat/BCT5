@@ -1,4 +1,5 @@
 import pool from '../../connect/db';
+import { createNotification } from '../notificationController';
 
 // ดึงรายชื่อผู้เข้าร่วมกิจกรรม
 export const getActivityParticipants = async (activity_id: number) => {
@@ -113,6 +114,7 @@ export const approveParticipant = async (registration_id: number, approved_by: n
          WHERE registration_id = $2`,
         [inProcessStatusId, registration_id]
       );
+      
 
       // บันทึกข้อมูลการอนุมัติใน registration_approvals ถ้ามีตารางนี้
       try {

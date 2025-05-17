@@ -4,9 +4,32 @@ import { authMiddleware } from '../middleware/authMiddleware';
 import type { CustomContext } from '../type/context';
 import { getStudentDashboard, getStudentActivityHistory, getStudentActivityDetail } from '../controller/student/activityHistoryController';
 import { filterActivitiesByType, getMyRegisteredActivities } from '../controller/student/studentController'
+import { cancelParticipation } from '../controller/staff/closeAndAssignPoints';
+
 export const studentRoute = new Elysia()
 
   .use(authMiddleware) // แนบ middleware ตรวจ JWT
+
+  .post('/cancel-participation/:activityId', async ({ params, body, user }) => {
+    if (!user || user.role !== 'student') {
+      return {
+        success: false,
+        message: 'ไม่มีสิทธิ์ในการยกเลิกการเข้าร่วมกิจกรรม'
+      };
+    }
+
+    const activity_id = parseInt(params.activityId);
+    const { reason } = body as { reason?: string };
+  
+    return await cancelParticipation(parseInt(user.id), activity_id, reason || '');
+  }, {
+    params: t.Object({
+      activityId: t.String()
+    }),
+    body: t.Object({
+      reason: t.Optional(t.String())
+    })
+  })
 
   .get('/student/profile', async ({ user }: CustomContext) => {
     if (user.role !== 'student') {
