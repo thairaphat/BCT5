@@ -124,3 +124,36 @@ export const refreshToken = (refreshToken: string): Promise<any> => {
     return Promise.reject(errorMessage);
   }
 };
+
+// ดึงกิจกรรมล่าสุดของผู้ใช้ (Dashboard)
+export const fetchLatestActivity = (): Promise<any> => {
+  try {
+    return api.get("/activities/latest"); // เปลี่ยน URL ให้ตรงกับ backend API ของคุณ
+  } catch (error) {
+    const errorMessage =
+      (error as Error).message || "เกิดข้อผิดพลาดในการดึงกิจกรรมล่าสุด";
+    return Promise.reject(errorMessage);
+  }
+};
+
+// ดึงการแจ้งเตือนล่าสุดของผู้ใช้ (Dashboard)
+export const fetchLatestNotification = (): Promise<any> => {
+  try {
+    return api.get("/notifications/latest"); // เปลี่ยน URL ให้ตรงกับ backend API ของคุณ
+  } catch (error) {
+    const errorMessage =
+      (error as Error).message || "เกิดข้อผิดพลาดในการดึงการแจ้งเตือนล่าสุด";
+    return Promise.reject(errorMessage);
+  }
+};
+
+// ดึงรายการกิจกรรมทั้งหมดของผู้ใช้ (ActivityMe)
+export const fetchActivities = (): Promise<any> => {
+  try {
+    return api.get("/activities"); // เปลี่ยน URL ให้ตรงกับ backend API ของคุณ
+  } catch (error) {
+    const errorMessage =
+      (error as Error).message || "เกิดข้อผิดพลาดในการดึงรายการกิจกรรม";
+    return Promise.reject(errorMessage);
+  }
+};

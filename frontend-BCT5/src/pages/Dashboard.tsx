@@ -5,6 +5,7 @@ import SearchBox from "../components/SearchBox";
 import { useEffect, useState } from "react";
 import Card from "../components/ui/card";
 import axios from "axios";
+import { fetchLatestActivity, fetchLatestNotification } from "../services/api";
 
 interface LatestActivity {
   image: string;
@@ -32,6 +33,22 @@ export default function Dashboard() {
     await dispatch(logout());
     navigate("/login");
   };
+
+useEffect(() => {
+  async function fetchData() {
+    try {
+      const latestActivity = await fetchLatestActivity();
+      setLatestActivity(latestActivity);
+
+      const latestNotification = await fetchLatestNotification();
+      setLatestNotification(latestNotification);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  fetchData();
+}, []);
+
 
   useEffect(() => {
     async function fetchLatestActivity() {
