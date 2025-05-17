@@ -22,8 +22,10 @@ pipeline {
                 // We need to explicitly checkout from SCM here
                 checkout scm
                 script {
-                    BRANCH_NAME = sh(script: "git for-each-ref --format='%(refname:short)' refs/heads/ | head -n 1", returnStdout: true).trim()
+                    def BRANCH_NAME = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
                     echo "✅ Guessed branch: ${BRANCH_NAME}"
+                    // Store in env if needed later
+                    env.BRANCH_NAME = BRANCH_NAME
                 }
             }
         }
