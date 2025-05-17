@@ -120,7 +120,7 @@ export const getActivityById = async (activityId: number) => {
              ad.description, ad.location, ad.start_date, ad.end_date, 
              ad.volunteer_hours, ad.volunteer_points,
              u.student_id as creator_student_id,
-             ud.first_name as creator_first_name, 
+             ud.first_name as creator_fir st_name, 
              ud.last_name as creator_last_name
       FROM activities a
       JOIN activity_details ad ON a.id = ad.id_activity_details
@@ -198,7 +198,7 @@ export const approveActivity = async (activityId: number, approvedBy: number) =>
       // อัปเดตสถานะเป็น 'open'
       await client.query(
         `UPDATE activities 
-         SET status = 'open', updated_at = CURRENT_TIMESTAMP 
+         SET status_check_id = '4', updated_at = CURRENT_TIMESTAMP 
          WHERE id = $1`,
         [activityId]
       );

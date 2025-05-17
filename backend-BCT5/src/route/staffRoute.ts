@@ -10,13 +10,11 @@ import {staffAuthMiddleware} from '../middleware/staffAuthMiddleware'
 type Context = {
   user: User;
 };
+
 export const staffRoute = new Elysia()
  .use(staffAuthMiddleware)
- 
-  
 
-  // ดึงข้อมูลกิจกรรมทั้งหมด
-  
+  // ดึงข้อมูลกิจกรรมทั้งหมด  
   .get('/activities', async ({ query }) => {
     const status = query.status ? query.status.split(',') : ['pending','approved','rejected','open', 'closed', 'cancelled'];
     return await getAllActivities(status);
@@ -139,7 +137,7 @@ export const staffRoute = new Elysia()
   })
 
   // ปิดกิจกรรม
-   .patch('/activities/:id/close', async ({ params, user }) => {
+  .patch('/activities/:id/close', async ({ params, user }) => {
     if (!user || user.role !== 'staff') {
       return {
         success: false,
@@ -165,6 +163,13 @@ export const staffRoute = new Elysia()
 
     const activity_id = parseInt(params.id);
     const { reason } = body;
+
+    if (!reason || reason.trim() === '') {
+      return {
+        success: false,
+        message: 'กรุณาระบุเหตุผลในการยกเลิกกิจกรรม'
+      };
+    }
 
     return await cancelActivity(activity_id, user.id, reason);
   }, {
