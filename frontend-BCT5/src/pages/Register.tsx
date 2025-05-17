@@ -34,7 +34,7 @@ export default function Register() {
   };
   const { status, error } = useAppSelector((state) => state.auth);
   useEffect(() => {
-    fetch("http://localhost:3000/api/faculties")
+    fetch("http://localhost:3000/faculties")
       .then((res) => res.json())
       .then((data) => {
         console.log("API data:", data);
@@ -53,7 +53,7 @@ export default function Register() {
       return;
     }
     setIsLoaded(false);
-    fetch(`http://localhost:3000/api/departments/${faculty_id}`)
+    fetch(`http://localhost:3000/departments/${faculty_id}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
@@ -141,7 +141,7 @@ export default function Register() {
     setValidationError(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
+      const response = await fetch('http://localhost:3000/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
