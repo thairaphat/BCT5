@@ -1,12 +1,6 @@
-import { createSlice, createAsyncThunk} from "@reduxjs/toolkit";
-import * as api from "../../services/api"; 
-import type { PayloadAction } from "@reduxjs/toolkit";
-
-interface User {
-  id: string;
-  name: string;
-  student_id: string;
-}
+// src/store/auth/authSlice.ts
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 interface AuthState {
   token: string | null;
@@ -20,23 +14,21 @@ const initialState: AuthState = {
   error: null,
 };
 
-interface User {
-  id: string;
-  name: string;
-  lastName: string;
-  email: string;
-  student_id: string;
-  faculty: string;
-  major: string;
-}
+export const login = createAsyncThunk(
+  'auth/login',
+  async (
+    { email, password }: { email: string; password: string },
+    thunkAPI
+  ) => {
+    try {
+      const response = await axios.post(
+        'https://btc5.thiraphat.online/backendapi/api/login',
+        { email, password }
+      );
 
-export const register = createAsyncThunk<
-  User,
-  { name: string; lastName: string; email: string; password: string; student_id: string; faculty: string; major: string },
-  { rejectValue: string }
->("auth/register", async (data, { rejectWithValue }) => {
-  try {
-    const { name, lastName, email, password, student_id, faculty, major } = data;
+      // สมมุติว่า backend ตอบแบบนี้:
+      // { token: "xxxxx" }
+      const token = response.data.token;
 
       if (!token) throw new Error("Token not found in response");
 
@@ -50,48 +42,8 @@ export const register = createAsyncThunk<
         'Login failed';
       return thunkAPI.rejectWithValue(message);
     }
-
-    const user: User = {
-      id: Date.now().toString(),
-      name,
-      lastName,
-      email,
-      student_id,
-      faculty,
-      major,
-    };
-
-    localStorage.setItem("user", JSON.stringify(user));
-    return user;
-  } catch (error) {
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
-    }
-    return rejectWithValue("เกิดข้อผิดพลาดที่ไม่คาดคิด");
-  }
-});
-
-export const login = createAsyncThunk<User, { studentId: string; password: string }, { rejectValue: string }>(
-  "auth/login",
-  async ({ studentId, password }, { rejectWithValue }) => {
-    try {
-      const response = await api.login(studentId, password);
-      const { token, user } = response;
-
-      localStorage.setItem("access_token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      return user; // user ต้องมี student_id
-    } catch (error) {
-      return rejectWithValue("Login failed");
-    }
   }
 );
-
-export const logout = createAsyncThunk("auth/logout", async () => {
-  localStorage.removeItem("user");
-  return null;
-});
 
 const authSlice = createSlice({
   name: 'auth',
