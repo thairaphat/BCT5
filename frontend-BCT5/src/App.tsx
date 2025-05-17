@@ -4,6 +4,13 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
+import MyActivities from "./pages/ActivityMe";
+import ActivityHistory from "./pages/ActivityHistory";
+import ActivityDetail from "./pages/ActivityDescript";
+import Profile from "./pages/Profile";
+import ActivityAll from "./pages/ActivityAll";
+import DashboardStaff from "./pages/DashboardStaff";
+import CreateActivity from "./pages/CreateActivity";
 
 export default function App() {
   return (
@@ -20,6 +27,14 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
+        <Route path="/activityMe" element={<MyActivities />} />
+        <Route path="/activityHistory" element={<ActivityHistory />} />
+        <Route path="/activityDescript" element={<ActivityDetail />} />
+        <Route path="/activityAll" element={<ActivityAll />} />
+        <Route path="/Profile" element={<Profile />} />
+
+        <Route path="/dashboardStaff" element={<DashboardStaff />} />
+        <Route path="/createActivity" element={<CreateActivity />} />
       </Route>
 
       <Route path="*" element={<div>ไม่พบหน้านี้</div>} />
