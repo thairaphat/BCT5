@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { register } from "../store/auth/authSlice";
+// import { register } from "../store/auth/authSlice";
 import {
   FiMail,
   FiUser,

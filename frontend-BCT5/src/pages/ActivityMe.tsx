@@ -79,12 +79,14 @@ useEffect(() => {
   async function fetchActivities() {
     try {
       const response = await axios.get("http://localhost:3000/api/student/activity-history", {
-        withCredentials: true, // ถ้า backend ใช้ cookie auth
+        withCredentials: true, // ถ้าใช้ cookie auth
       });
 
-      // สมมุติ response.data = { activities: [...] }
-      if (Array.isArray(response.data.activities)) {
-        setActivityList(response.data.activities);
+      // ตรวจสอบโครงสร้าง response
+      if (Array.isArray(response.data)) {
+        setActivityList(response.data); // ถ้า API คืน array ตรง ๆ
+      } else if (Array.isArray(response.data.activities)) {
+        setActivityList(response.data.activities); // ถ้าอยู่ใน object
       } else {
         console.warn("Unexpected API format", response.data);
         setActivityList([]);
