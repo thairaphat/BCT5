@@ -17,7 +17,10 @@ export const joinActivity = async (user_id: number, activity_id: number) => {
 
     // ตรวจสอบสถานะกิจกรรม
     const activityCheck = await pool.query(
-      'SELECT status, max_participants FROM activities WHERE id = $1',
+      `SELECT a.id, s.status_name, a.max_participants
+       FROM activities a
+       JOIN status_check s ON a.status_check_id = s.id
+       WHERE a.id = $1 AND a.is_deleted = FALSE`,
       [activity_id]
     );
 
@@ -28,7 +31,7 @@ export const joinActivity = async (user_id: number, activity_id: number) => {
       };
     }
 
-    if (activityCheck.rows[0].status !== 'open') {
+    if (activityCheck.rows[0].status_name !== 'open') {
       return {
         success: false,
         message: 'กิจกรรมนี้ไม่ได้เปิดให้ลงทะเบียน'
@@ -64,13 +67,30 @@ export const joinActivity = async (user_id: number, activity_id: number) => {
       };
     }
 
+    // ดึง status_check_id สำหรับสถานะ 'pending'
+    const statusResult = await pool.query(
+      'SELECT id FROM status_check WHERE status_name = $1',
+      ['pending']
+    );
+
+    if (statusResult.rows.length === 0) {
+      return {
+        success: false,
+        message: 'ไม่พบสถานะ "pending" ในระบบ'
+      };
+    }
+
+    const pendingStatusId = statusResult.rows[0].id;
+
     // เพิ่มข้อมูลการลงทะเบียน
     const currentDate = new Date().toISOString();
+    
+    // ใช้ status_check_id ในการเพิ่มข้อมูล แต่ยังคง status ไว้ด้วยเพื่อความเข้ากันได้กับระบบเก่า
     const result = await pool.query(
-      `INSERT INTO registrations (user_id, activity_id, registration_date, status, created_at, updated_at)
-       VALUES ($1, $2, $3, 'pending', $4, $5)
+      `INSERT INTO registrations (user_id, activity_id, registration_date, status_check_id, status, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING registration_id`,
-      [user_id, activity_id, currentDate, currentDate, currentDate]
+      [user_id, activity_id, currentDate, pendingStatusId, 'pending', currentDate, currentDate]
     );
 
     return {
@@ -93,15 +113,17 @@ export const joinActivity = async (user_id: number, activity_id: number) => {
 export const getStudentActivities = async (user_id: number) => {
   try {
     const result = await pool.query(
-      `SELECT r.registration_id, r.user_id, r.activity_id, r.status as registration_status, 
+      `SELECT r.registration_id, r.user_id, r.activity_id, sr.status_name as registration_status, 
               r.registration_date, r.attended_date, r.points_earned, r.hours_earned,
-              a.id as activity_id, a.name, a.activity_type, a.status as activity_status,
+              a.id as activity_id, a.name, a.activity_type, sa.status_name as activity_status,
               ad.description, ad.location, ad.start_date, ad.end_date, 
               ad.volunteer_hours, ad.volunteer_points
        FROM registrations r
        JOIN activities a ON r.activity_id = a.id
        JOIN activity_details ad ON a.id = ad.id_activity_details
-       WHERE r.user_id = $1
+       JOIN status_check sr ON r.status_check_id = sr.id
+       JOIN status_check sa ON a.status_check_id = sa.id
+       WHERE r.user_id = $1 AND a.is_deleted = FALSE
        ORDER BY r.registration_date DESC`,
       [user_id]
     );

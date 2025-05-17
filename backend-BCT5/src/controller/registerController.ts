@@ -49,6 +49,18 @@ export const registerUser = async (
       return { success: false, message: 'ไม่พบภาควิชาที่เลือก หรือภาควิชาไม่ได้อยู่ในคณะที่เลือก' };
     }
 
+    // Get the status_check_id for 'active' status
+    const statusResult = await pool.query(
+      'SELECT id FROM status_check WHERE status_name = $1',
+      ['active']
+    );
+
+    if (statusResult.rows.length === 0) {
+      return { success: false, message: 'Status "active" not found in status_check table' };
+    }
+
+    const activeStatusId = statusResult.rows[0].id;
+
     // เริ่ม transaction
     const client = await pool.connect();
     try {
@@ -64,12 +76,12 @@ export const registerUser = async (
 
       const userDetailsId = detailsResult.rows[0].id_user_details;
 
-      // 2. จากนั้นสร้าง users และเชื่อมโยงกับ user_details
+      // 2. จากนั้นสร้าง users และเชื่อมโยงกับ user_details และ status_check
       const userResult = await client.query(
-        `INSERT INTO users (student_id, password, role, status, id_user_details, created_at)
-         VALUES ($1, $2, 'student', 'active', $3, CURRENT_TIMESTAMP)
-         RETURNING id_user, student_id, role, status`,
-        [student_id, password, userDetailsId]
+        `INSERT INTO users (student_id, password, role, status_check_id, id_user_details, created_at)
+         VALUES ($1, $2, 'student', $3, $4, CURRENT_TIMESTAMP)
+         RETURNING id_user, student_id, role`,
+        [student_id, password, activeStatusId, userDetailsId]
       );
 
       await client.query('COMMIT');

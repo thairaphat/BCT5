@@ -4,7 +4,7 @@ import pool from '../../connect/db';
 export const getPendingActivities = async () => {
   try {
     const result = await pool.query(`
-      SELECT a.id, a.name, a.activity_type, a.reg_deadline, a.status, a.max_participants, 
+      SELECT a.id, a.name, a.activity_type, a.reg_deadline, s.status_name as status, a.max_participants, 
              a.created_at, a.updated_at, a.created_by, 
              ad.description, ad.location, ad.start_date, ad.end_date, 
              ad.volunteer_hours, ad.volunteer_points,
@@ -15,7 +15,8 @@ export const getPendingActivities = async () => {
       JOIN activity_details ad ON a.id = ad.id_activity_details
       JOIN users u ON a.created_by = u.id_user
       JOIN user_details ud ON u.id_user_details = ud.id_user_details
-      WHERE a.status = 'pending'
+      JOIN status_check s ON a.status_check_id = s.id
+      WHERE s.status_name = 'pending'
       ORDER BY a.created_at DESC
     `);
 
@@ -37,7 +38,7 @@ export const getPendingActivities = async () => {
 export const getAllActivities = async (status?: string[], activityTypes?: string[]) => {
   try {
     let query = `
-      SELECT a.id, a.name, a.activity_type, a.reg_deadline, a.status, a.max_participants, 
+      SELECT a.id, a.name, a.activity_type, a.reg_deadline, s.status_name as status, a.max_participants, 
              a.created_at, a.updated_at, a.created_by, 
              ad.description, ad.location, ad.start_date, ad.end_date, 
              ad.volunteer_hours, ad.volunteer_points,
@@ -48,6 +49,7 @@ export const getAllActivities = async (status?: string[], activityTypes?: string
       JOIN activity_details ad ON a.id = ad.id_activity_details
       JOIN users u ON a.created_by = u.id_user
       JOIN user_details ud ON u.id_user_details = ud.id_user_details
+      JOIN status_check s ON a.status_check_id = s.id
       WHERE 1=1
     `;
 
@@ -113,17 +115,18 @@ export const getActivityTypes = async () => {
 export const getActivityById = async (activityId: number) => {
   try {
     const result = await pool.query(`
-      SELECT a.id, a.name, a.activity_type, a.reg_deadline, a.status, a.max_participants, 
+      SELECT a.id, a.name, a.activity_type, a.reg_deadline, s.status_name as status, a.max_participants, 
              a.created_at, a.updated_at, a.created_by, 
              ad.description, ad.location, ad.start_date, ad.end_date, 
              ad.volunteer_hours, ad.volunteer_points,
              u.student_id as creator_student_id,
-             ud.first_name as creator_first_name, 
+             ud.first_name as creator_fir st_name, 
              ud.last_name as creator_last_name
       FROM activities a
       JOIN activity_details ad ON a.id = ad.id_activity_details
       JOIN users u ON a.created_by = u.id_user
       JOIN user_details ud ON u.id_user_details = ud.id_user_details
+      JOIN status_check s ON a.status_check_id = s.id
       WHERE a.id = $1
     `, [activityId]);
 
@@ -195,7 +198,7 @@ export const approveActivity = async (activityId: number, approvedBy: number) =>
       // อัปเดตสถานะเป็น 'open'
       await client.query(
         `UPDATE activities 
-         SET status = 'open', updated_at = CURRENT_TIMESTAMP 
+         SET status_check_id = '4', updated_at = CURRENT_TIMESTAMP 
          WHERE id = $1`,
         [activityId]
       );

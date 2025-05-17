@@ -7,14 +7,15 @@ import {
   getActivityParticipants, 
   approveParticipant, 
   rejectParticipant,
-  recordAttendance 
+  recordAttendance,
+  getRejectionHistory
 } from '../controller/staff/manageParticipantsController';
 
 // import controller ใหม่สำหรับประวัติกิจกรรม
 import {
   getStudentActivityHistory,
   getStudentActivityDetail,
-  getStudentDashboard
+  getStudentDashboard,
 } from '../controller/student/activityHistoryController';
 
 // Student routes
@@ -69,10 +70,24 @@ const studentRoutes = new Elysia()
     
     return await getStudentDashboard(parseInt(user.id));
   });
+  
 
 // Staff routes
 const staffRoutes = new Elysia()
   .use(authMiddleware)
+  .get('/rejection-history/:registrationId', async ({ params, user, set }) => {
+    if (!user || user.role !== 'staff') {
+      set.status = 403;
+      return { success: false, message: 'ไม่มีสิทธิ์ดำเนินการ' };
+    }
+
+    const registration_id = parseInt(params.registrationId);
+    return await getRejectionHistory(registration_id);
+  }, {
+    params: t.Object({
+      registrationId: t.String()
+    })
+  })
   .get('/activity-participants/:activityId', async ({ params, user, set }) => {
     if (!user || user.role !== 'staff') {
       set.status = 403;

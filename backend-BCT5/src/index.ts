@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { testConnection } from "./connect/db";
+import cors from "@elysiajs/cors";
 import { loginRoute } from "./route/LoginRoute";
 import { registerRoute } from "./route/register";
 import { authMiddleware } from './middleware/authMiddleware';
@@ -7,6 +8,7 @@ import type { CustomContext } from './type/context';
 import { adminRoute } from './route/adminRoute';
 import { studentRoute } from './route/studentRoute';
 import { staffRoute } from './route/staffRoute';
+import { notificationRoutes } from './route/notificationRoutes';
 import { routes as activityRoutes } from './route/activityRoutes';
 async function startApp() {
   try {
@@ -17,14 +19,19 @@ async function startApp() {
     }
 
   const app = new Elysia()
-  .use(adminRoute)
-  .use(loginRoute)
-  .use(registerRoute)
-  .use(studentRoute) 
-  .use(activityRoutes)
+    .use(cors({
+        origin: ['http://localhost:5173', 'http://localhost:5174'],
+        credentials: true                
+      }))
   .group('/api', app => {
     return app
+      .use(adminRoute)
+      .use(loginRoute)
+      .use(registerRoute)
       .use(staffRoute) 
+      .use(studentRoute) 
+      .use(activityRoutes)
+      .use(notificationRoutes)
       .use(authMiddleware)
       .get('/profile', ({ user }: CustomContext) => {
         return `hello, user ${user.id}`;

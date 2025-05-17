@@ -6,7 +6,23 @@ export const banUser = async (id_user: number) => {
     return { success: false, message: 'Missing user ID', status: 400 };
   }
 
-  await pool.query('UPDATE users SET status = $1 WHERE id_user = $2', ['banned', id_user]);
+  // Get the status_check_id for 'banned' status
+  const statusResult = await pool.query(
+    'SELECT id FROM status_check WHERE status_name = $1',
+    ['banned']
+  );
+
+  if (statusResult.rows.length === 0) {
+    return { success: false, message: 'Status "banned" not found in status_check table', status: 500 };
+  }
+
+  const bannedStatusId = statusResult.rows[0].id;
+
+  // Update user with the status_check_id
+  await pool.query(
+    'UPDATE users SET status_check_id = $1 WHERE id_user = $2',
+    [bannedStatusId, id_user]
+  );
 
   return { success: true, message: 'User has been banned' };
 };
@@ -17,7 +33,23 @@ export const unbanUser = async (id_user: number) => {
     return { success: false, message: 'Missing user ID', status: 400 };
   }
 
-  await pool.query('UPDATE users SET status = $1 WHERE id_user = $2', ['active', id_user]);
+  // Get the status_check_id for 'active' status
+  const statusResult = await pool.query(
+    'SELECT id FROM status_check WHERE status_name = $1',
+    ['active']
+  );
+
+  if (statusResult.rows.length === 0) {
+    return { success: false, message: 'Status "active" not found in status_check table', status: 500 };
+  }
+
+  const activeStatusId = statusResult.rows[0].id;
+
+  // Update user with the status_check_id
+  await pool.query(
+    'UPDATE users SET status_check_id = $1 WHERE id_user = $2',
+    [activeStatusId, id_user]
+  );
 
   return { success: true, message: 'User has been unbanned' };
 };

@@ -4,18 +4,41 @@ import { authMiddleware } from '../middleware/authMiddleware';
 import type { CustomContext } from '../type/context';
 import { getStudentDashboard, getStudentActivityHistory, getStudentActivityDetail } from '../controller/student/activityHistoryController';
 import { filterActivitiesByType, getMyRegisteredActivities } from '../controller/student/studentController'
+import { cancelParticipation } from '../controller/staff/closeAndAssignPoints';
+
 export const studentRoute = new Elysia()
 
   .use(authMiddleware) // แนบ middleware ตรวจ JWT
+
+  .post('/cancel-participation/:activityId', async ({ params, body, user }) => {
+    if (!user || user.role !== 'student') {
+      return {
+        success: false,
+        message: 'ไม่มีสิทธิ์ในการยกเลิกการเข้าร่วมกิจกรรม'
+      };
+    }
+
+    const activity_id = parseInt(params.activityId);
+    const { reason } = body as { reason?: string };
+  
+    return await cancelParticipation(parseInt(user.id), activity_id, reason || '');
+  }, {
+    params: t.Object({
+      activityId: t.String()
+    }),
+    body: t.Object({
+      reason: t.Optional(t.String())
+    })
+  })
 
   .get('/student/profile', async ({ user }: CustomContext) => {
     if (user.role !== 'student') {
       return { success: false, message: 'Access denied' };
     }
 
-   const result = await pool.query(
+    const result = await pool.query(
       `SELECT 
-        u.id_user, u.student_id, u.role, u.status,
+        u.id_user, u.student_id, u.role, sc.status_name,
         d.id_user_details, d.first_name, d.last_name, d.email,
         d.volunteer_hours, d.volunteer_points, d.faculty_id, d.department_id,
         f.faculty_name, dp.department_name
@@ -23,6 +46,7 @@ export const studentRoute = new Elysia()
       JOIN user_details d ON u.id_user_details = d.id_user_details
       LEFT JOIN faculty f ON d.faculty_id = f.faculty_id
       LEFT JOIN department dp ON d.department_id = dp.department_id
+      JOIN status_check sc ON u.status_check_id = sc.id
       WHERE u.id_user = $1`,
       [user.id]
     );
