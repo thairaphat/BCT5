@@ -3,8 +3,8 @@ import pool from '../connect/db';
 export const registerUser = async (
   student_id: string,
   password: string,
-  firstname: string,
-  lastname: string,
+  first_name: string,
+  last_name: string,
   email: string,
   faculty_id: number,
   department_id: number
@@ -59,7 +59,7 @@ export const registerUser = async (
         `INSERT INTO user_details (first_name, last_name, email, faculty_id, department_id)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING id_user_details, first_name, last_name, email, faculty_id, department_id`,
-        [firstname, lastname, email, faculty_id, department_id]
+        [first_name, last_name, email, faculty_id, department_id]
       );
 
       const userDetailsId = detailsResult.rows[0].id_user_details;
@@ -81,8 +81,8 @@ export const registerUser = async (
         user: {
           id: userResult.rows[0].id_user,
           student_id,
-          firstname,
-          lastname,
+          first_name,
+          last_name,
           email,
           role: 'student',
           status: 'active',

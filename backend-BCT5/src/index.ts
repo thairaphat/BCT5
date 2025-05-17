@@ -8,7 +8,6 @@ import { adminRoute } from './route/adminRoute';
 import { studentRoute } from './route/studentRoute';
 import { staffRoute } from './route/staffRoute';
 import { routes as activityRoutes } from './route/activityRoutes';
-
 async function startApp() {
   try {
     const dbConnected = await testConnection();
