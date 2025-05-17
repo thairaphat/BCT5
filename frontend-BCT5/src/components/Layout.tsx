@@ -8,6 +8,7 @@ import { FiMenu, FiX } from "react-icons/fi";
 export default function Layout() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  
   const user = useAppSelector((state) => state.auth.currentUser);
   const [isOpen, setIsOpen] = useState(false);
 

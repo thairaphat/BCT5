@@ -1,5 +1,15 @@
-import React, { useState } from "react";
 import SearchBox from "../components/SearchBox";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+interface ActivityType {
+  id: number;
+  type: string;
+  title: string;
+  description: string;
+  image?: string;
+  author: string;
+}
 
 const activityTypes = ["ทั้งหมด", "อบรม", "ช่วยงาน", "อาสา"];
 
@@ -28,15 +38,44 @@ const sampleActivities = [
 export default function ActivityAll() {
   const [type, setType] = useState("ทั้งหมด");
   const [searchTerm, setSearchTerm] = useState("");
+  const [activities, setActivities] = useState<ActivityType[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setType(e.target.value);
   };
 
+  useEffect(() => {
+    async function fetchActivities() {
+      try {
+  const res = await axios.get("/api/activities");
+  if (res.data && Array.isArray(res.data.activities)) {
+    setActivities(res.data.activities);
+  } else {
+    setActivities([]); // ป้องกัน undefined
+    console.warn("API response.activities is not an array", res.data);
+  }
+} catch (error) {
+  console.error("Error fetching activities:", error);
+  setActivities([]);
+} finally {
+  setLoading(false);
+}
+
+    }
+    fetchActivities();
+  }, []);
+
   const filteredActivities =
+    // type === "ทั้งหมด"
+    //   ? sampleActivities
+    //   : sampleActivities.filter((a) => a.type === type);
     type === "ทั้งหมด"
-      ? sampleActivities
-      : sampleActivities.filter((a) => a.type === type);
+    ? activities || []
+    : (activities || []).filter((a) => a.type === type);
+  const filteredWithSearch = filteredActivities.filter((a) =>
+    a.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="max-w-7xl mx-auto p-4">
@@ -87,7 +126,36 @@ export default function ActivityAll() {
   </div>
 </div>
   ))}
+  {loading ? (
+    <p className="col-span-full text-center py-10">กำลังโหลดกิจกรรม...</p>
+  ) : filteredWithSearch.length === 0 ? (
+    <p className="col-span-full text-center py-10">ไม่พบกิจกรรมที่ตรงกับเงื่อนไข</p>
+  ) : (
+    filteredWithSearch.map((a) => (
+      <div
+        key={a.id}
+        className="p-4 border rounded-lg shadow-sm flex flex-col justify-between h-full min-h-[450px]"
+      >
+        <div>
+          <img
+            src={a.image}
+            alt={a.title}
+            className="rounded-md mb-3 w-full aspect-video object-cover"
+          />
+          <p className="text-sm font-semibold text-yellow-600">“{a.title}”</p>
+          <p className="text-sm text-gray-600 mt-2 line-clamp-4">{a.description}</p>
+        </div>
+        <div className="mt-4">
+          <p className="text-sm text-gray-500">โดย {a.author}</p>
+          <button className="mt-3 w-full bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-1.5 rounded">
+            ดูรายละเอียดเพิ่มเติม
+          </button>
+        </div>
+      </div>
+    ))
+  )}
 </div>
+
 
     </div>
   );
