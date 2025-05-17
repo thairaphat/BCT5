@@ -75,7 +75,31 @@ export default function MyActivities() {
   }
   loadActivities();
 }, []);
+useEffect(() => {
+  async function fetchActivities() {
+    try {
+      const response = await axios.get("http://localhost:3000/api/student/activity-history", {
+        withCredentials: true, // ถ้า backend ใช้ cookie auth
+      });
 
+      // สมมุติ response.data = { activities: [...] }
+      if (Array.isArray(response.data.activities)) {
+        setActivityList(response.data.activities);
+      } else {
+        console.warn("Unexpected API format", response.data);
+        setActivityList([]);
+      }
+
+    } catch (error) {
+      console.error("Failed to fetch activities", error);
+      setActivityList([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchActivities();
+}, []);
 useEffect(() => {
   async function fetchActivities() {
       try {
