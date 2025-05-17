@@ -121,7 +121,7 @@ export default function Dashboard() {
       {/* ฝั่งขวา */}
       <div className="space-y-6">
         {/* กิจกรรมล่าสุด */}
-        <Card className="p-4">
+        <Card className="p-4 bg-white dark:bg-gray-800 text-black dark:text-white">
             <h2 className="text-3xl font-bold mb-3 text-center">กิจกรรมล่าสุดของฉัน</h2>
             {latestActivity ? (
               <>
@@ -149,7 +149,7 @@ export default function Dashboard() {
           </Card>
 
         {/* การแจ้งเตือนล่าสุด */}
-        <Card className="p-4">
+        <Card className="p-4 bg-white dark:bg-gray-800 text-black dark:text-white">
   <h2 className="text-xl font-bold mb-3">การแจ้งเตือนล่าสุดของฉัน</h2>
   {latestNotification ? (
     <div className="bg-gray-100 rounded-lg p-3 space-y-1">
