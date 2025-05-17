@@ -24,7 +24,7 @@ export default function Register() {
   const [faculty_id, setFaculty_id] = useState("");
   const [department_id, setDepartment_id] = useState("");
   const [faculties, setFaculties] = useState<{ faculty_id: number; faculty_name: string }[]>([]);
-  const [departments, setDepartments] = useState<{ id: number; name: string }[]>([]);
+ const [departments, setDepartments] = useState<{ department_id: number; department_name: string }[]>([]);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   type Faculty = {
@@ -34,35 +34,44 @@ export default function Register() {
   };
   const { status, error } = useAppSelector((state) => state.auth);
   useEffect(() => {
-  fetch("http://localhost:3000/api/faculties")
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("API data:", data);
-      if (data.success && Array.isArray(data.faculties)) {
-        setFaculties(data.faculties); // <-- This is correct
-      } else {
-        console.error("คณะไม่ใช่ array", data);
-      }
-    })
-    .catch(console.error);
-}, []);
+    fetch("http://localhost:3000/api/faculties")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("API data:", data);
+        if (data.success && Array.isArray(data.faculties)) {
+          setFaculties(data.faculties); // <-- This is correct
+        } else {
+          console.error("คณะไม่ใช่ array", data);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     if (!faculty_id) {
       setDepartments([]);
       return;
     }
-    fetch(`http://localhost:3000/api/departments?faculty_id=${faculty_id}`)
-      .then(res => res.json())
+    setIsLoaded(false);
+    fetch(`http://localhost:3000/api/departments/${faculty_id}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then(data => {
-        console.log("API data:", data);
-        if (Array.isArray(data)) {
-          setDepartments(data);
+        console.log("API data (departments):", data); // ดูข้อมูลที่ได้
+        if (data.success && Array.isArray(data.departments)) {
+          setDepartments(data.departments);
         } else {
-          console.error("สาขาไม่ใช่ array", data);
+          console.error("Response ไม่ถูกต้อง", data);
+          setDepartments([]);
         }
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error("Error fetching departments:", err);
+        setDepartments([]);
+      })
+      .finally(() => setIsLoaded(true));
   }, [faculty_id]);
   useEffect(() => {
     setIsLoaded(true);
@@ -296,19 +305,24 @@ export default function Register() {
                     <FiUser className="mr-2 text-primary" />
                     สาขา
                   </label>
-                  <select
-                    id="department_id"
-                    value={department_id}
-                    onChange={(e) => setDepartment_id(e.target.value)}
-                    required
-                  >
-                    <option value="">-- กรุณาเลือกสาขา --</option>
-                    {departments.map((dept) => (
-                      <option key={dept.id} value={dept.id}>
-                        {dept.name}
-                      </option>
-                    ))}
-                  </select>
+             <select
+  id="department_id"
+  value={department_id}
+  onChange={(e) => setDepartment_id(e.target.value)}
+  required
+>
+  <option value="">
+    {departments && departments.length > 0
+      ? '-- กรุณาเลือกสาขา --'
+      : 'ไม่มีข้อมูลสาขา'}
+  </option>
+
+  {departments && departments.length > 0 && departments.map((dept) => (
+    <option key={dept.department_id} value={dept.department_id}>
+      {dept.department_name}
+    </option>
+  ))}
+</select>
                 </div>
               </div>
 
