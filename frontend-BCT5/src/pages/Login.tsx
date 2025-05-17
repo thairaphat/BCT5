@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { login } from "../store/auth/authSlice";
-import { FiMail, FiAlertCircle, FiKey, FiCreditCard } from "react-icons/fi";
+import { FiMail, FiAlertCircle, FiKey } from "react-icons/fi";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 interface LocationState {
