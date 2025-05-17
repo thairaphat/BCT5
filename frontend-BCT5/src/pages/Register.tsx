@@ -34,7 +34,7 @@ export default function Register() {
   };
   const { status, error } = useAppSelector((state) => state.auth);
   useEffect(() => {
-    fetch("http://localhost:3000/api/faculties")
+    fetch("http://localhost:3000/faculties")
       .then((res) => res.json())
       .then((data) => {
         console.log("API data:", data);
@@ -53,7 +53,7 @@ export default function Register() {
       return;
     }
     setIsLoaded(false);
-    fetch(`http://localhost:3000/api/departments/${faculty_id}`)
+    fetch(`http://localhost:3000/departments/${faculty_id}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
@@ -141,7 +141,7 @@ export default function Register() {
     setValidationError(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
+      const response = await fetch('http://localhost:3000/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -180,7 +180,7 @@ export default function Register() {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-6">
             <p className="text-black mt-1 flex">
-              ยินดีต้อนรับสู่ <p className="text-primary"> VolunteerHub</p>
+              ยินดีต้อนรับสู่ <p className="text-primary pl-3">VolunteerHub</p>
             </p>
             <h2 className="text-5xl font-bold text-black">สมัครสมาชิก</h2>
           </div>
@@ -273,58 +273,57 @@ export default function Register() {
                 />
               </div>
 
-              <div className="flex">
-                <div>
-                  <label
-                    htmlFor="faculty_id"
-                    className="block text-gray-700 font-medium mb-2 flex items-center"
-                  >
-                    <FiUser className="mr-2 text-primary" />
-                    คณะ
-                  </label>
-                  <select
-                    id="faculty_id"
-                    value={faculty_id}
-                    onChange={(e) => setFaculty_id(e.target.value)}
-                    required
-                  >
-                    <option value="">-- กรุณาเลือกคณะ --</option>
-                    {faculties.map((faculty) => (
-                      <option key={faculty.faculty_id} value={faculty.faculty_id}>
-                        {faculty.faculty_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+             <div className="flex flex-col md:flex-row gap-4">
+  <div className="w-full">
+    <label
+      htmlFor="faculty_id"
+      className="block text-gray-700 font-medium mb-2 flex items-center"
+    >
+      <FiUser className="mr-2 text-primary" />
+      คณะ
+    </label>
+    <select
+      id="faculty_id"
+      value={faculty_id}
+      onChange={(e) => setFaculty_id(e.target.value)}
+      required
+      className="w-full px-4 py-3 f rounded-lg border border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-300 focus:ring-opacity-50 transition-all duration-200 outline-none"
+    >
+      <option value="">กรุณาเลือกคณะ</option>
+      {faculties.map((faculty) => (
+        <option key={faculty.faculty_id} value={faculty.faculty_id}>
+          {faculty.faculty_name}
+        </option>
+      ))}
+    </select>
+  </div>
 
-                <div>
-                  <label
-                    htmlFor="department_id"
-                    className="block text-gray-700 font-medium mb-2 flex items-center"
-                  >
-                    <FiUser className="mr-2 text-primary" />
-                    สาขา
-                  </label>
-             <select
-  id="department_id"
-  value={department_id}
-  onChange={(e) => setDepartment_id(e.target.value)}
-  required
->
-  <option value="">
-    {departments && departments.length > 0
-      ? '-- กรุณาเลือกสาขา --'
-      : 'ไม่มีข้อมูลสาขา'}
-  </option>
-
-  {departments && departments.length > 0 && departments.map((dept) => (
-    <option key={dept.department_id} value={dept.department_id}>
-      {dept.department_name}
-    </option>
-  ))}
-</select>
-                </div>
-              </div>
+  <div className="w-full">
+    <label
+      htmlFor="department_id"
+      className="block text-gray-700 font-medium mb-2 flex items-center"
+    >
+      <FiUser className="mr-2 text-primary" />
+      สาขา
+    </label>
+    <select
+      id="department_id"
+      value={department_id}
+      onChange={(e) => setDepartment_id(e.target.value)}
+      required
+      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-yellow-500 focus:ring focus:ring-yellow-300 focus:ring-opacity-50 transition-all duration-200 outline-none"
+    >
+      <option value="">
+        {departments.length > 0 ? "-- กรุณาเลือกสาขา --" : "ไม่มีข้อมูลสาขา"}
+      </option>
+      {departments.map((dept) => (
+        <option key={dept.department_id} value={dept.department_id}>
+          {dept.department_name}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
 
               <div>
                 <label
