@@ -7,7 +7,10 @@ import { jwtSecret } from '../utils/secret';
 
 export const loginUser = async (student_id: string, password: string) => {
   const result = await pool.query(
-    'SELECT * FROM users WHERE student_id = $1 LIMIT 1',
+    `SELECT u.*, sc.status_name 
+     FROM users u
+     JOIN status_check sc ON u.status_check_id = sc.id
+     WHERE u.student_id = $1 LIMIT 1`,
     [student_id]
   );
 
@@ -17,21 +20,17 @@ export const loginUser = async (student_id: string, password: string) => {
     return { success: false, message: 'User not found' };
   }
 
- 
   if (user.password !== password) {
     return { success: false, message: 'Incorrect password' };
   }
 
-
-  if (user.status === 'banned') {
+  // Check if the user is banned using status_name
+  if (user.status_name === 'banned') {
     return {
       success: false,
       message: 'Your account has been banned. Please contact admin.',
     };
   }
-
-
-
 
   const allowedRoles = ['student', 'admin', 'staff'];
 
@@ -41,6 +40,7 @@ export const loginUser = async (student_id: string, password: string) => {
       message: 'This role is not allowed to login.',
     };
   }
+  
   let redirectPath = '/';
   switch (user.role) {
     case 'admin':
@@ -56,18 +56,18 @@ export const loginUser = async (student_id: string, password: string) => {
       redirectPath = '/';
   }
 
-
   const token = await new SignJWT({
-  id: user.id_user,
-  role: user.role,
-  student_id: user.student_id,
-})
-
-.setProtectedHeader({ alg: 'HS256' })
-.setExpirationTime('2h')
-.sign(jwtSecret);
-console.log(' login-token:', token);
-console.log(' login-secret:', Buffer.from(jwtSecret).toString('base64'));
+    id: user.id_user,
+    role: user.role,
+    student_id: user.student_id,
+  })
+  .setProtectedHeader({ alg: 'HS256' })
+  .setExpirationTime('2h')
+  .sign(jwtSecret);
+  
+  console.log(' login-token:', token);
+  console.log(' login-secret:', Buffer.from(jwtSecret).toString('base64'));
+  
   return {
     success: true,
     message: 'Login successful',
@@ -78,7 +78,7 @@ console.log(' login-secret:', Buffer.from(jwtSecret).toString('base64'));
       id: user.id_user,
       student_id: user.student_id,
       role: user.role,
-      status: user.status,
+      status: user.status_name,
     }
   };
 };

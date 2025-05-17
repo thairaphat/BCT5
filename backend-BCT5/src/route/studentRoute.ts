@@ -13,9 +13,9 @@ export const studentRoute = new Elysia()
       return { success: false, message: 'Access denied' };
     }
 
-   const result = await pool.query(
+    const result = await pool.query(
       `SELECT 
-        u.id_user, u.student_id, u.role, u.status,
+        u.id_user, u.student_id, u.role, sc.status_name,
         d.id_user_details, d.first_name, d.last_name, d.email,
         d.volunteer_hours, d.volunteer_points, d.faculty_id, d.department_id,
         f.faculty_name, dp.department_name
@@ -23,6 +23,7 @@ export const studentRoute = new Elysia()
       JOIN user_details d ON u.id_user_details = d.id_user_details
       LEFT JOIN faculty f ON d.faculty_id = f.faculty_id
       LEFT JOIN department dp ON d.department_id = dp.department_id
+      JOIN status_check sc ON u.status_check_id = sc.id
       WHERE u.id_user = $1`,
       [user.id]
     );

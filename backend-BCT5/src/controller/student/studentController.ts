@@ -10,11 +10,12 @@ export async function getStudentProfile({ user, set }: CustomContext) {
 
   const result = await pool.query(
     `SELECT 
-      u.id_user, u.student_id, u.role, u.status,
+      u.id_user, u.student_id, u.role, sc.status_name,
       d.id_user_details, d.first_name, d.last_name, d.email,
       d.volunteer_hours, d.volunteer_points, d.faculty_id, d.department_id
     FROM users u
     JOIN user_details d ON u.id_user_details = d.id_user_details
+    JOIN status_check sc ON u.status_check_id = sc.id
     WHERE u.id_user = $1`,
     [user.id]
   )
@@ -67,10 +68,11 @@ export async function filterActivitiesByType({ params, user, set }: { params: Re
     `SELECT 
        a.id, a.name, a.activity_type, 
        ad.description, ad.location, ad.start_date, ad.end_date, 
-       a.reg_deadline, a.status, a.max_participants, 
+       a.reg_deadline, s.status_name as status, a.max_participants, 
        ad.volunteer_hours, ad.volunteer_points, a.created_by
      FROM activities a
      JOIN activity_details ad ON a.id_activity_details = ad.id_activity_details
+     JOIN status_check s ON a.status_check_id = s.id
      WHERE a.activity_type = $1`,
     [type]
   );
@@ -83,8 +85,6 @@ export async function filterActivitiesByType({ params, user, set }: { params: Re
   return { success: true, activities: result.rows };
 }
 
-
-
 export async function getMyRegisteredActivities({ user, set }: CustomContext) {
   if (!user || user.role !== 'student') {
     set.status = 403;
@@ -93,13 +93,14 @@ export async function getMyRegisteredActivities({ user, set }: CustomContext) {
 
   const result = await pool.query(
     `SELECT 
-       a.id, a.name, a.activity_type, a.reg_deadline, a.status, a.max_participants, a.created_by,
+       a.id, a.name, a.activity_type, a.reg_deadline, s.status_name as status, a.max_participants, a.created_by,
        ad.description, ad.location, ad.start_date, ad.end_date,
        ad.volunteer_hours, ad.volunteer_points,
        r.status as registration_status, r.registration_date
      FROM registrations r
      JOIN activities a ON r.activity_id = a.id
      JOIN activity_details ad ON a.id_activity_details = ad.id_activity_details
+     JOIN status_check s ON a.status_check_id = s.id
      WHERE r.user_id = $1`,
     [user.id]
   );
