@@ -6,7 +6,7 @@ export const createActivity = async (
   location: string,
   start_date: string,
   end_date: string,
-  activity_type: string,
+  activity_type: number,
   reg_deadline: string,
   max_participants: number,
   volunteer_hours: number,
