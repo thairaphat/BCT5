@@ -13,7 +13,7 @@ import {
 
 export default function Register() {
   const [first_name, setfirst_name] = useState("");
-  const [last_name, setlast_name] = useState("");
+  const [lastname, setLastname] = useState("");
   const [student_id, setStudent_id] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,12 +23,47 @@ export default function Register() {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [faculty_id, setFaculty_id] = useState("");
   const [department_id, setDepartment_id] = useState("");
-
+  const [faculties, setFaculties] = useState<{ faculty_id: number; faculty_name: string }[]>([]);
+  const [departments, setDepartments] = useState<{ id: number; name: string }[]>([]);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
+  type Faculty = {
+    faculty_id: number;
+    faculty_code?: string;  // ถ้ามี
+    faculty_name: string;
+  };
   const { status, error } = useAppSelector((state) => state.auth);
+  useEffect(() => {
+  fetch("http://localhost:3000/api/faculties")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("API data:", data);
+      if (data.success && Array.isArray(data.faculties)) {
+        setFaculties(data.faculties); // <-- This is correct
+      } else {
+        console.error("คณะไม่ใช่ array", data);
+      }
+    })
+    .catch(console.error);
+}, []);
 
+  useEffect(() => {
+    if (!faculty_id) {
+      setDepartments([]);
+      return;
+    }
+    fetch(`http://localhost:3000/api/departments?faculty_id=${faculty_id}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("API data:", data);
+        if (Array.isArray(data)) {
+          setDepartments(data);
+        } else {
+          console.error("สาขาไม่ใช่ array", data);
+        }
+      })
+      .catch(console.error);
+  }, [faculty_id]);
   useEffect(() => {
     setIsLoaded(true);
   }, []);
@@ -104,7 +139,7 @@ export default function Register() {
           student_id: student_id,
           password: password,
           first_name: first_name,
-          last_name: last_name,
+          last_name: lastname,
           email: email,
           faculty_id: parseInt(faculty_id) || 0,
           department_id: parseInt(department_id) || 0
@@ -130,9 +165,8 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-login bg-cover">
       <div
-        className={`w-full max-w-md transition-all duration-700 ease-out ${
-          isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        }`}
+        className={`w-full max-w-md transition-all duration-700 ease-out ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
       >
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-6">
@@ -193,17 +227,17 @@ export default function Register() {
 
                 <div>
                   <label
-                    htmlFor="last_name"
+                    htmlFor="lastname"
                     className="block text-gray-700 font-medium mb-2 flex items-center"
                   >
                     <FiUser className="mr-2 text-primary" />
                     นามสกุล
                   </label>
                   <input
-                    id="last_name"
+                    id="lastname"
                     type="text"
-                    value={last_name}
-                    onChange={(e) => setlast_name(e.target.value)}
+                    value={lastname}
+                    onChange={(e) => setLastname(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none ml-2"
                     placeholder="นามสกุล"
                     required
@@ -243,13 +277,14 @@ export default function Register() {
                     id="faculty_id"
                     value={faculty_id}
                     onChange={(e) => setFaculty_id(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none"
                     required
                   >
                     <option value="">-- กรุณาเลือกคณะ --</option>
-                    <option value="1">วิศวกรรมศาสตร์</option>
-                    <option value="2">วิทยาศาสตร์</option>
-                    <option value="3">บริหารธุรกิจ</option>
+                    {faculties.map((faculty) => (
+                      <option key={faculty.faculty_id} value={faculty.faculty_id}>
+                        {faculty.faculty_name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -265,13 +300,14 @@ export default function Register() {
                     id="department_id"
                     value={department_id}
                     onChange={(e) => setDepartment_id(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all duration-200 outline-none ml-2"
                     required
                   >
                     <option value="">-- กรุณาเลือกสาขา --</option>
-                    <option value="1">คอมพิวเตอร์</option>
-                    <option value="2">โยธา</option>
-                    <option value="3">ไฟฟ้า</option>
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -302,15 +338,14 @@ export default function Register() {
                         ความแข็งแรงของรหัสผ่าน:
                       </div>
                       <div
-                        className={`text-xs ${
-                          passwordStrength <= 1
-                            ? "text-red-500"
-                            : passwordStrength === 2
+                        className={`text-xs ${passwordStrength <= 1
+                          ? "text-red-500"
+                          : passwordStrength === 2
                             ? "text-orange-500"
                             : passwordStrength === 3
-                            ? "text-yellow-600"
-                            : "text-green-600"
-                        }`}
+                              ? "text-yellow-600"
+                              : "text-green-600"
+                          }`}
                       >
                         {getStrengthText()}
                       </div>
@@ -343,11 +378,10 @@ export default function Register() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`w-full px-4 py-3 rounded-lg border focus:ring focus:ring-opacity-20 transition-all duration-200 outline-none ${
-                    confirmPassword && password !== confirmPassword
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-primary focus:ring-primary"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-lg border focus:ring focus:ring-opacity-20 transition-all duration-200 outline-none ${confirmPassword && password !== confirmPassword
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:border-primary focus:ring-primary"
+                    }`}
                   placeholder="••••••••"
                   required
                 />
