@@ -4,6 +4,7 @@ import { logout } from "../store/auth/loginSlice";
 import SearchBox from "../components/SearchBox";
 import { useEffect, useState } from "react";
 import Card from "../components/ui/card";
+import { api } from "../services/api";
 import axios from "axios";
 
 // Define interfaces for API response
