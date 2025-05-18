@@ -29,7 +29,7 @@ export default function Login() {
     e.preventDefault();
     console.log(handleSubmit);
     try {
-      await dispatch(login({ studentId, password })).unwrap();
+      await dispatch(login({ student_id: studentId, password })).unwrap();
       navigate("/");
     } catch (err) {
       console.error("Login failed:", err);
