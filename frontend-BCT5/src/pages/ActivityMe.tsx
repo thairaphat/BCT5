@@ -3,7 +3,8 @@ import React from "react";
 import SearchBox from "../components/SearchBox";
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import { api } from "../services/api"
 
 // Status mapping from backend to frontend display names
 const statusMapping: Record<string, string> = {
@@ -134,7 +135,7 @@ export default function MyActivities() {
       }
       
       const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
-      const response = await axios.get(`${baseURL}/activity-types`, {
+      const response = await api.get(`${baseURL}/activity-types`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -172,7 +173,7 @@ export default function MyActivities() {
       const token = localStorage.getItem("token");
       const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
       
-      const response = await axios.post(
+      const response = await api.post(
         `${baseURL}/student/cancel-participation/${activityId}`,
         { reason: "ยกเลิกโดยผู้ใช้" }, // You can make this a form input if needed
         {
@@ -212,7 +213,7 @@ export default function MyActivities() {
       }
       
       const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
-      const response = await axios.get(`${baseURL}/student/my-activities`, {
+      const response = await api.get(`${baseURL}/student/my-activities`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
