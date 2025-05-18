@@ -1,11 +1,13 @@
+// src/store/auth/authSlice.ts
 import { createSlice, createAsyncThunk} from "@reduxjs/toolkit";
-import * as api from "../../services/api"; 
 import type { PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
 
+const URL_api ='';
 interface User {
   id: string;
   name: string;
-  student_id: string;
+  email: string;
 }
 
 interface AuthState {
@@ -29,19 +31,21 @@ interface User {
   id: string;
   name: string;
   lastName: string;
+  password:string;
   email: string;
-  student_id: string;
+  studentId: string;
   faculty: string;
   major: string;
 }
 
+// เพิ่มส่วนนี้ด้านบน ก่อน createSlice
 export const register = createAsyncThunk<
   User,
-  { name: string; lastName: string; email: string; password: string; student_id: string; faculty: string; major: string },
+  { name: string; lastName: string; email: string; password: string; studentId: string; faculty: string; major: string },
   { rejectValue: string }
 >("auth/register", async (data, { rejectWithValue }) => {
   try {
-    const { name, lastName, email, password, student_id, faculty, major } = data;
+    const { name, lastName, email, password, studentId, faculty, major } = data;
 
     if (email === "demo@example.com") {
       return rejectWithValue("อีเมลนี้ถูกใช้ไปแล้ว");
@@ -52,7 +56,8 @@ export const register = createAsyncThunk<
       name,
       lastName,
       email,
-      student_id,
+      password,
+      studentId,
       faculty,
       major,
     };
@@ -67,22 +72,38 @@ export const register = createAsyncThunk<
   }
 });
 
-export const login = createAsyncThunk<User, { studentId: string; password: string }, { rejectValue: string }>(
-  "auth/login",
-  async ({ studentId, password }, { rejectWithValue }) => {
-    try {
-      const response = await api.login(studentId, password);
-      const { token, user } = response;
+export const login = createAsyncThunk<
+  User,
+  { student_id: string; password: string },
+  { rejectValue: string }
+>("auth/login", async ({ student_id, password }, { rejectWithValue }) => {
+  try {
+    const response = await axios.post('http://localhost:3000/api/login', { student_id, password });
+    const token = response.data.token;
 
-      localStorage.setItem("access_token", token);
+    // if (student_id === "" && password === "") {
+    //   const user: User = {
+    //     id: "",
+    //     name: "",
+    //     lastName: "",
+    //     password:'',
+    //     email:"",
+    //     studentId: "",
+    //     faculty: "",
+    //     major: "",
+    //   };
+    if (!token) throw new Error("Token not found in response");
       localStorage.setItem("user", JSON.stringify(user));
-
-      return user; // user ต้องมี student_id
-    } catch (error) {
-      return rejectWithValue("Login failed");
+      return user;
+    
+  } catch (error) {
+    if (error instanceof Error) {
+      return rejectWithValue(error.message);
     }
+    return rejectWithValue("เกิดข้อผิดพลาด");
   }
-);
+});
+
 
 export const logout = createAsyncThunk("auth/logout", async () => {
   localStorage.removeItem("user");

@@ -180,25 +180,28 @@ export const getStudentDashboard = async (user_id: number) => {
     const activityStats = await pool.query(
       `SELECT 
         COUNT(*) as total_activities,
-        SUM(CASE WHEN r.status = 'pending' THEN 1 ELSE 0 END) as pending_count,
-        SUM(CASE WHEN r.status = 'approved' THEN 1 ELSE 0 END) as approved_count, 
-        SUM(CASE WHEN r.status = 'attended' THEN 1 ELSE 0 END) as attended_count,
-        SUM(CASE WHEN r.status = 'rejected' THEN 1 ELSE 0 END) as rejected_count,
-        SUM(CASE WHEN r.status = 'attended' THEN r.points_earned ELSE 0 END) as total_points,
-        SUM(CASE WHEN r.status = 'attended' THEN r.hours_earned ELSE 0 END) as total_hours
+        SUM(CASE WHEN sc.status_name = 'pending' THEN 1 ELSE 0 END) as pending_count,
+        SUM(CASE WHEN sc.status_name IN ('approved', 'in-process') THEN 1 ELSE 0 END) as approved_count, 
+        SUM(CASE WHEN sc.status_name = 'passed' THEN 1 ELSE 0 END) as attended_count,
+        SUM(CASE WHEN sc.status_name IN ('rejected', 'failed') THEN 1 ELSE 0 END) as rejected_count,
+        SUM(CASE WHEN sc.status_name = 'passed' THEN r.points_earned ELSE 0 END) as total_points,
+        SUM(CASE WHEN sc.status_name = 'passed' THEN r.hours_earned ELSE 0 END) as total_hours
       FROM registrations r
+      JOIN status_check sc ON r.status_check_id = sc.id
       WHERE r.user_id = $1`,
       [user_id]
     );
 
     // ดึงข้อมูลกิจกรรมล่าสุด 5 รายการ
     const recentActivities = await pool.query(
-      `SELECT r.registration_id, r.status as registration_status, 
+      `SELECT r.registration_id, sc.status_name as registration_status, 
               r.registration_date, a.id as activity_id, a.name, 
-              a.activity_type, a.status as activity_status,
+              a.activity_type, sc2.status_name as activity_status,
               ad.start_date, ad.end_date
        FROM registrations r
+       JOIN status_check sc ON r.status_check_id = sc.id
        JOIN activities a ON r.activity_id = a.id
+       JOIN status_check sc2 ON a.status_check_id = sc2.id
        JOIN activity_details ad ON a.id = ad.id_activity_details
        WHERE r.user_id = $1
        ORDER BY r.registration_date DESC
@@ -208,14 +211,15 @@ export const getStudentDashboard = async (user_id: number) => {
 
     // ดึงข้อมูลกิจกรรมที่กำลังจะถึง
     const upcomingActivities = await pool.query(
-      `SELECT r.registration_id, r.status as registration_status, 
+      `SELECT r.registration_id, sc.status_name as registration_status, 
               a.id as activity_id, a.name, a.activity_type,
               ad.start_date, ad.end_date
        FROM registrations r
+       JOIN status_check sc ON r.status_check_id = sc.id
        JOIN activities a ON r.activity_id = a.id
        JOIN activity_details ad ON a.id = ad.id_activity_details
        WHERE r.user_id = $1
-         AND r.status = 'approved'
+         AND sc.status_name IN ('approved', 'in-process')
          AND ad.start_date > CURRENT_DATE
        ORDER BY ad.start_date ASC
        LIMIT 3`,
@@ -224,12 +228,13 @@ export const getStudentDashboard = async (user_id: number) => {
 
     // ดึงข้อมูลส่วนตัวของนักศึกษา
     const userProfile = await pool.query(
-      `SELECT u.id_user, u.student_id, u.role, u.status,
+      `SELECT u.id_user, u.student_id, u.role, sc.status_name as status,
               ud.first_name, ud.last_name, ud.email,
               ud.volunteer_hours, ud.volunteer_points,
               f.faculty_name, d.department_name
        FROM users u
        JOIN user_details ud ON u.id_user_details = ud.id_user_details
+       JOIN status_check sc ON u.status_check_id = sc.id
        LEFT JOIN faculty f ON ud.faculty_id = f.faculty_id
        LEFT JOIN department d ON ud.department_id = d.department_id
        WHERE u.id_user = $1`,
