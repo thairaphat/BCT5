@@ -18,13 +18,13 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk<
   string, // payload type = token
-  { email: string; password: string },
+  { student_id: string; password: string },
   { rejectValue: string }
 >(
   'auth/login',
-  async ({ email, password }, thunkAPI) => {
+  async ({ student_id, password }, thunkAPI) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/login', { email, password });
+      const response = await axios.post('http://localhost:3000/api/login', { student_id, password });
       const token = response.data.token;
 
       if (!token) throw new Error("Token not found in response");

@@ -1,6 +1,8 @@
 // src/store/auth/authSlice.ts
 import { createSlice, createAsyncThunk} from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
+
 const URL_api ='';
 interface User {
   id: string;
@@ -76,22 +78,22 @@ export const login = createAsyncThunk<
   { rejectValue: string }
 >("auth/login", async ({ student_id, password }, { rejectWithValue }) => {
   try {
-    if (student_id === "demo@example.com" && password === "password") {
-      const user: User = {
-        id: "",
-        name: "",
-        lastName: "",
-        password:'',
-        email:"",
-        studentId: "",
-        faculty: "",
-        major: "",
-      };
-
+    const response = await axios.post('http://localhost:3000/api/login', { student_id, password });
+    const token = response.data.token;
+    // if (student_id === "" && password === "") {
+    //   const user: User = {
+    //     id: "",
+    //     name: "",
+    //     lastName: "",
+    //     password:'',
+    //     email:"",
+    //     studentId: "",
+    //     faculty: "",
+    //     major: "",
+    //   };
+    if (!token) throw new Error("Token not found in response");
       localStorage.setItem("user", JSON.stringify(user));
       return user;
-    } else {
-      return rejectWithValue("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
     }
   } catch (error) {
     if (error instanceof Error) {
