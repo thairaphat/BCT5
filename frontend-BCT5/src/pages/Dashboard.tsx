@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { logout } from "../store/auth/authSlice";
+import { logout } from "../store/auth/loginSlice";
 import SearchBox from "../components/SearchBox";
 import { useEffect, useState } from "react";
 import Card from "../components/ui/card";
@@ -78,7 +78,7 @@ export default function Dashboard() {
   const [latestNotification, setLatestNotification] = useState<any>(null);
   
   const user = useAppSelector((state) => state.auth.currentUser);
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("token");
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -180,13 +180,13 @@ export default function Dashboard() {
               </div>
               
               {/* Show stats (if available) */}
-              {(item.points > 0 || item.hours > 0 || item.count > 0) && (
+              {/* {(item.points > 0 || item.hours > 0 || item.count > 0) && (
                 <div className="absolute top-4 right-4 bg-yellow-400 text-black font-bold px-3 py-2 rounded-full z-10">
                   {item.points > 0 && `${item.points} คะแนน`}
                   {item.hours > 0 && `${item.hours} ชั่วโมง`}
                   {item.count > 0 && `${item.count} กิจกรรม`}
                 </div>
-              )}
+              )} */}
             </div>
           ))}
         </div>
