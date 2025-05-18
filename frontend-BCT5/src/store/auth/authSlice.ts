@@ -80,11 +80,11 @@ export const login = createAsyncThunk<
   try {
     const response = await axios.post('http://localhost:3000/api/login', { student_id, password });
     const token = response.data.token;
+
     // if (student_id === "" && password === "") {
     //   const user: User = {
     //     id: "",
     //     name: "",
-    //     lastName: "",
     //     password:'',
     //     email:"",
     //     studentId: "",
