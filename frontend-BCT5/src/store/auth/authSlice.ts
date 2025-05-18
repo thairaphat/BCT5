@@ -80,6 +80,7 @@ export const login = createAsyncThunk<
   try {
     const response = await axios.post('http://localhost:3000/api/login', { student_id, password });
     const token = response.data.token;
+
     // if (student_id === "" && password === "") {
     //   const user: User = {
     //     id: "",
@@ -94,7 +95,7 @@ export const login = createAsyncThunk<
     if (!token) throw new Error("Token not found in response");
       localStorage.setItem("user", JSON.stringify(user));
       return user;
-    }
+    
   } catch (error) {
     if (error instanceof Error) {
       return rejectWithValue(error.message);
