@@ -94,7 +94,7 @@ export const login = createAsyncThunk<
     if (!token) throw new Error("Token not found in response");
       localStorage.setItem("user", JSON.stringify(user));
       return user;
-    }
+    
   } catch (error) {
     if (error instanceof Error) {
       return rejectWithValue(error.message);
