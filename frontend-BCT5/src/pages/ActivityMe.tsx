@@ -127,7 +127,7 @@ export default function MyActivities() {
   // Fetch activity types from backend
   const fetchActivityTypes = async () => {
     try {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("token");
       if (!token) {
         navigate("/login");
         return;
@@ -169,7 +169,7 @@ export default function MyActivities() {
     }
     
     try {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("token");
       const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
       
       const response = await axios.post(
@@ -205,7 +205,7 @@ export default function MyActivities() {
   const fetchActivities = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("token");
       if (!token) {
         navigate("/login");
         return;

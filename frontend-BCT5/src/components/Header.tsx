@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { logout } from "../store/auth/authSlice";
 import { FiMenu, FiX, FiChevronDown } from "react-icons/fi";
@@ -57,8 +57,8 @@ export default function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex space-x-6 text-white dark:text-yellow-400 font-semibold">
-          <a href="/">หน้าแรก</a>
-          <a href="/activityMe">กิจกรรม</a>
+          <a className="cursor-pointer" onClick={() => navigate('/')}>หน้าแรก</a>
+          <a className="cursor-pointer" onClick={() => navigate('/activityMe')}>กิจกรรม</a>
         </nav>
 
         {/* Account Button */}

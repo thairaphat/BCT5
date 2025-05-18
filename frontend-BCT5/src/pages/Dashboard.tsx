@@ -78,7 +78,7 @@ export default function Dashboard() {
   const [latestNotification, setLatestNotification] = useState<any>(null);
   
   const user = useAppSelector((state) => state.auth.currentUser);
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("token");
 
   const handleLogout = async () => {
     await dispatch(logout());
