@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { testConnection } from "./connect/db";
-import cors from "@elysiajs/cors";
+import { cors } from "@elysiajs/cors";
 import { loginRoute } from "./route/LoginRoute";
 import { registerRoute } from "./route/register";
 import { authMiddleware } from './middleware/authMiddleware';
