@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell } from "recharts";
+import axios from "axios";
 
 interface ActivityStat {
   name: string;
@@ -82,11 +83,22 @@ export default function Profile() {
       setLoading(false);
     }, 1000);
 
-    // TODO: เปลี่ยนเป็นเรียก API จริง เช่น
-    // axios.get("/api/profile").then(res => { setData(res.data); setLoading(false); })
-
     return () => clearTimeout(timer);
   }, []);
+
+  // เรียก API จริง 
+  // useEffect(() => {
+  //   async function fetchProfile() {
+  //     try {
+  //       const res = await axios.get("/api/profile");
+  //       setData(res.data);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   fetchProfile();
+  // }, []);
 
   if (loading) return <p className="text-center py-10">กำลังโหลดข้อมูลโปรไฟล์...</p>;
   if (!data) return <p className="text-center py-10 text-red-500">ไม่พบข้อมูลโปรไฟล์</p>;
