@@ -77,14 +77,19 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock API call
-    const timer = setTimeout(() => {
-      setData(mockProfileData);
+  async function fetchProfile() {
+    try {
+      const res = await axios.get<ProfileData>("/api/profile");
+      console.log(res)
+      setData(res.data);
+    } catch (error) {
+      console.error("ไม่สามารถดึงข้อมูลโปรไฟล์ได้:", error);
+    } finally {
       setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }
+  fetchProfile();
+}, []);
 
   // เรียก API จริง 
   // useEffect(() => {
