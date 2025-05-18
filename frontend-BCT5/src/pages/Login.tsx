@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { login } from "../store/auth/authSlice";
+import { login } from "../store/auth/loginSlice";
 import { FiMail, FiAlertCircle, FiKey } from "react-icons/fi";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
@@ -28,7 +28,7 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await dispatch(login({ studentId, password })).unwrap();
+      await dispatch(login({ student_id: studentId, password })).unwrap();
       navigate("/");
     } catch (err) {
       console.error("Login failed:", err);
