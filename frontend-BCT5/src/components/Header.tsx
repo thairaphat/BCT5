@@ -84,10 +84,12 @@ export default function Header() {
   ${theme === "dark" ? "bg-[#1a1a1a] text-white border-gray-700" : "bg-white text-black border-gray-200"}`}>
 
   {/* Profile */}
-  <div className="p-5 text-center border-b">
-    <img src={user1.avatar} alt="avatar" className="w-20 h-20 rounded-full mx-auto border-4 border-yellow-400 shadow" />
-    <div className="font-semibold text-lg mt-3">{user1.nameTH}</div>
-  </div>
+  <a onClick={() => navigate('/Profile')}>
+    <div className="p-5 text-center border-b">
+      <img src={user1.avatar} alt="avatar" className="w-20 h-20 rounded-full mx-auto border-4 border-yellow-400 shadow" />
+      <div className="font-semibold text-lg mt-3">{user1.nameTH}</div>
+    </div>
+  </a>
 
   {/* Roles */}
   <div className="flex flex-col gap-2 px-5 py-4 border-b">

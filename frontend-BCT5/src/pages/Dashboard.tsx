@@ -5,6 +5,7 @@ import SearchBox from "../components/SearchBox";
 import { useEffect, useState } from "react";
 import Card from "../components/ui/card";
 import { api } from "../services/api";
+import axios from "axios";
 
 // Define interfaces for API response
 interface DashboardStats {
@@ -90,7 +91,7 @@ export default function Dashboard() {
       setLoading(true);
       try {
         const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
-        const response = await api.get(`${baseURL}/student/dashboard`, {
+        const response = await axios.get(`${baseURL}/student/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
