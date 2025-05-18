@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { logout } from "../store/auth/authSlice";
@@ -9,10 +9,59 @@ export default function Header() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.currentUser);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
   const [activeRole, setActiveRole] = useState<"user" | "staff">("user");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  
+  const [activityDropdownOpen, setActivityDropdownOpen] = useState(false);
+  const activityDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [pagesDropdownOpen, setPagesDropdownOpen] = useState(false);
+  const pagesDropdownRef = useRef<HTMLDivElement>(null);
+
+   // ปิด dropdown ถ้าคลิกนอก สำหรับทั้งสอง dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        activityDropdownRef.current &&
+        !activityDropdownRef.current.contains(event.target as Node)
+      ) {
+        setActivityDropdownOpen(false);
+      }
+      if (
+        pagesDropdownRef.current &&
+        !pagesDropdownRef.current.contains(event.target as Node)
+      ) {
+        setPagesDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ปิด dropdown ถ้าคลิกรอบนอก (optional)
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    }
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   const [theme, setTheme] = useState<"light" | "dark">(() =>
     typeof window !== "undefined" && localStorage.getItem("theme") === "dark"
@@ -57,9 +106,174 @@ export default function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex space-x-6 text-white dark:text-yellow-400 font-semibold">
-          <a className="cursor-pointer" onClick={() => navigate('/')}>หน้าแรก</a>
-          <a className="cursor-pointer" onClick={() => navigate('/activityMe')}>กิจกรรม</a>
-        </nav>
+      <a className="cursor-pointer" onClick={() => navigate("/")}>
+        หน้าแรก
+      </a>
+
+      <div className="relative" ref={dropdownRef}>
+        <button
+          className="cursor-pointer focus:outline-none"
+          onClick={() => setDropdownOpen((prev) => !prev)}
+        >
+          กิจกรรม ▼
+        </button>
+
+        {dropdownOpen && (
+          <div className="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
+            <a
+              onClick={() => {
+                navigate("/activityMe");
+                setDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              กิจกรรมของฉัน
+            </a>
+            <a
+              onClick={() => {
+                navigate("/activityAll");
+                setDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              กิจกรรมทั้งหมด
+            </a>
+            <a
+              onClick={() => {
+                navigate("/activityHistory");
+                setDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              ประวัติกิจกรรม
+            </a>
+          </div>
+        )}
+      </div>
+      {/* ปุ่ม หน้าทั้งหมด */}
+      <div className="relative" ref={pagesDropdownRef}>
+        <button
+          className="cursor-pointer focus:outline-none"
+          onClick={() => setPagesDropdownOpen((prev) => !prev)}
+        >
+          หน้าทั้งหมด ▼
+        </button>
+
+        {pagesDropdownOpen && (
+          <div className="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10">
+            <a
+              onClick={() => {
+                navigate("/activityMe");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              MyActivities
+            </a>
+            <a
+              onClick={() => {
+                navigate("/activityHistory");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              ActivityHistory
+            </a>
+            <a
+              onClick={() => {
+                navigate("/activityDescript");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              ActivityDetail
+            </a>
+            <a
+              onClick={() => {
+                navigate("/activityAll");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              ActivityAll
+            </a>
+            <a
+              onClick={() => {
+                navigate("/Profile");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              Profile
+            </a>
+            <a
+              onClick={() => {
+                navigate("/dashboardStaff");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              DashboardStaff
+            </a>
+            <a
+              onClick={() => {
+                navigate("/createActivity");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              CreateActivity
+            </a>
+            <a
+              onClick={() => {
+                navigate("/ManageOverview");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              ManageOverview
+            </a>
+            <a
+              onClick={() => {
+                navigate("/DashboardAdmin");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              DashboardAdmin
+            </a>
+            <a
+              onClick={() => {
+                navigate("/ManagePetitionActivity");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              ManagePetitionActivity
+            </a>
+            <a
+              onClick={() => {
+                navigate("/ManageRoleAdmin");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              ManageRoleAdmin
+            </a>
+            <a
+              onClick={() => {
+                navigate("/OverallActivityAdmin");
+                setPagesDropdownOpen(false);
+              }}
+              className="block px-4 py-2 text-gray-800 dark:text-yellow-400 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              OverallActivityAdmin
+            </a>
+          </div>
+        )}
+      </div>
+      
+    </nav>
 
         {/* Account Button */}
         <div className="relative">
