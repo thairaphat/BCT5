@@ -71,7 +71,7 @@ export const login = createAsyncThunk<
     const response = await api.login(studentId, password);
     const { token, user } = response;
 
-    localStorage.setItem("access_token", token);
+    localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
 
     return user;
