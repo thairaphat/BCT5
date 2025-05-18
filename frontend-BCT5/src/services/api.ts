@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-const api = axios.create({
+export const api = axios.create({
   baseURL: apiBaseUrl,
 
 // const apiClient = axios.create({
@@ -15,7 +15,7 @@ let isRefreshing = false;
 
 api.interceptors.request.use(
   (config: any): any => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("token");
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -52,7 +52,7 @@ api.interceptors.response.use(
               refresh_token: refreshToken,
             });
 
-            localStorage.setItem("access_token", response.data.access_token);
+            localStorage.setItem("token", response.data.access_token);
             localStorage.setItem("refresh_token", response.data.refresh_token);
             originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
 
@@ -61,7 +61,7 @@ api.interceptors.response.use(
             return axios(originalRequest);
           } catch (refreshError) {
             isRefreshing = false;
-            localStorage.removeItem("access_token");
+            localStorage.removeItem("token");
             localStorage.removeItem("refresh_token");
 
             if (!window.location.pathname.includes("/login")) {
@@ -73,7 +73,7 @@ api.interceptors.response.use(
             );
           }
         } else {
-          localStorage.removeItem("access_token");
+          localStorage.removeItem("token");
           localStorage.removeItem("refresh_token");
 
           if (!window.location.pathname.includes("/login")) {
@@ -82,7 +82,7 @@ api.interceptors.response.use(
         }
       } else if (error.response.status === 401) {
         if (!window.location.pathname.includes("/login")) {
-          localStorage.removeItem("access_token");
+          localStorage.removeItem("token");
           localStorage.removeItem("refresh_token");
           window.location.href = "/login";
         }
@@ -108,7 +108,7 @@ export const login = (student_id: string, password: string): Promise<any> => {
 
 export const logout = (): Promise<any> => {
   try {
-    localStorage.removeItem("access_token");
+    localStorage.removeItem("token");
     localStorage.removeItem("refresh_token");
     return api.get("/user/logout");
   } catch (error) {

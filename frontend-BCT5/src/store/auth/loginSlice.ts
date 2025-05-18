@@ -1,8 +1,18 @@
 // store/auth/loginSlice.ts
 import { createSlice, createAsyncThunk} from "@reduxjs/toolkit";
-import * as api from "../../services/api"; 
 import type { PayloadAction } from "@reduxjs/toolkit";
-import axios from 'axios';
+import axios from "axios";
+
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const api = axios.create({
+  baseURL: apiBaseUrl,
+
+// const apiClient = axios.create({
+//   baseURL: " https://btc5.thiraphat.online/backendapi/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 interface AuthState {
   token: string | null;
@@ -18,13 +28,13 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk<
   string, // payload type = token
-  { email: string; password: string },
+  { student_id: string; password: string },
   { rejectValue: string }
 >(
   'auth/login',
-  async ({ email, password }, thunkAPI) => {
+  async ({ student_id, password }, thunkAPI) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/login', { email, password });
+      const response = await api.post(apiBaseUrl + '/login', { student_id, password });
       const token = response.data.token;
 
       if (!token) throw new Error("Token not found in response");
