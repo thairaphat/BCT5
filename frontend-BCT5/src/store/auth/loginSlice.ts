@@ -1,6 +1,5 @@
 // store/auth/loginSlice.ts
 import { createSlice, createAsyncThunk} from "@reduxjs/toolkit";
-import * as api from "../../services/api"; 
 import type { PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 

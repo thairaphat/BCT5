@@ -85,7 +85,6 @@ export const login = createAsyncThunk<
     //   const user: User = {
     //     id: "",
     //     name: "",
-    //     lastName: "",
     //     password:'',
     //     email:"",
     //     studentId: "",
@@ -94,7 +93,7 @@ export const login = createAsyncThunk<
     //   };
     if (!token) throw new Error("Token not found in response");
       localStorage.setItem("user", JSON.stringify(user));
-      return user;
+      return user.name;
     
   } catch (error) {
     if (error instanceof Error) {
