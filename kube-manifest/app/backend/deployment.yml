@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 75
       containers:
         - name: backendapi
-          image: docker.io/zaserzafear/bct5-backend:v3
+          image: docker.io/zaserzafear/bct5-backend:v4
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
